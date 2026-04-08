@@ -17,22 +17,21 @@ function ProjectCard({ project, onClick, index, lang }: { project: Project; onCl
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.6, delay: index * 0.1, ease: [0.25, 0.1, 0.25, 1] }}
-      className="group relative rounded-2xl cursor-pointer bg-[#161616] min-h-[160px] min-w-[280px] max-w-[380px] h-full transition-all duration-300"
+      className="group relative self-stretch min-h-[160px] min-w-[280px] max-w-[380px] flex-none cursor-pointer overflow-hidden rounded-2xl bg-[#161616] transition-all duration-300"
       onClick={onClick}
       onContextMenu={(e) => e.preventDefault()}
     >
+      <img
+        src={project.thumb}
+        alt={name}
+        className="protected-image absolute inset-0 h-full w-full object-cover transition-all duration-500 group-hover:blur-sm group-hover:brightness-[0.45] group-hover:scale-105"
+        referrerPolicy="no-referrer"
+        onDragStart={(e) => e.preventDefault()}
+        onContextMenu={(e) => e.preventDefault()}
+      />
+      <div className="image-protect-wrapper absolute inset-0 z-[1] rounded-2xl" />
       {/* Border overlay visible on hover */}
       <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-accent transition-colors duration-300 z-20 pointer-events-none" />
-      <div className="absolute inset-0 rounded-2xl overflow-hidden image-protect-wrapper">
-        <img
-          src={project.thumb}
-          alt={name}
-          className="w-full h-full object-cover block transition-all duration-500 group-hover:blur-sm group-hover:brightness-[0.45] group-hover:scale-105 protected-image"
-          referrerPolicy="no-referrer"
-          onDragStart={(e) => e.preventDefault()}
-          onContextMenu={(e) => e.preventDefault()}
-        />
-      </div>
       <div className="absolute inset-0 flex flex-col items-start justify-end p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 z-10">
         <div className="font-display text-sm font-bold text-fg mb-2 tracking-tight">{name}</div>
         <div className="flex flex-wrap gap-1.5">
