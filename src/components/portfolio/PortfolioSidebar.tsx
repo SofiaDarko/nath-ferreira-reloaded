@@ -9,9 +9,10 @@ interface SidebarProps {
   isLoggedIn: boolean;
   onLogout: () => void;
   t: Record<string, string>;
+  showAdminButton?: boolean;
 }
 
-const PortfolioSidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, onAdminClick, isLoggedIn, onLogout, t }) => {
+const PortfolioSidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, onAdminClick, isLoggedIn, onLogout, t, showAdminButton = false }) => {
   return (
     <aside className="w-16 h-full border-r border-border flex flex-col items-center justify-between py-5 flex-shrink-0 bg-bg relative z-50">
       <div className="w-9 h-9 rounded-full border-2 border-accent flex items-center justify-center">
