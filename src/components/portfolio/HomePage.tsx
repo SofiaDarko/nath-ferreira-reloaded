@@ -17,7 +17,7 @@ function ProjectCard({ project, onClick, index, lang }: { project: Project; onCl
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.6, delay: index * 0.1, ease: [0.25, 0.1, 0.25, 1] }}
-      className="group relative rounded-2xl overflow-hidden cursor-pointer bg-[#161616] min-h-[160px] min-w-[280px] max-w-[380px] transition-all duration-300 hover:ring-2 hover:ring-accent"
+      className="group relative rounded-2xl overflow-hidden cursor-pointer bg-[#161616] min-h-[160px] min-w-[280px] max-w-[380px] transition-all duration-300 hover:ring-2 hover:ring-inset hover:ring-accent"
       onClick={onClick}
       onContextMenu={(e) => e.preventDefault()}
     >
