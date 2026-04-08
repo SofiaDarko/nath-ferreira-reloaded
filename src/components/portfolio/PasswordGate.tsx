@@ -6,15 +6,24 @@ interface PasswordGateProps {
   onClose: () => void;
 }
 
-const ADMIN_PASSWORD = 'nath2025';
+// SHA-256 hash of the admin password (not the password itself)
+const ADMIN_HASH = '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8';
+
+async function sha256(message: string): Promise<string> {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
 const PasswordGate: React.FC<PasswordGateProps> = ({ onSuccess, onClose }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
+    const hash = await sha256(password);
+    if (hash === ADMIN_HASH) {
       onSuccess();
     } else {
       setError('Senha incorreta. Tente novamente.');
