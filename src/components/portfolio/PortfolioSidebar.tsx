@@ -9,9 +9,10 @@ interface SidebarProps {
   isLoggedIn: boolean;
   onLogout: () => void;
   t: Record<string, string>;
+  showAdminButton?: boolean;
 }
 
-const PortfolioSidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, onAdminClick, isLoggedIn, onLogout, t }) => {
+const PortfolioSidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, onAdminClick, isLoggedIn, onLogout, t, showAdminButton = false }) => {
   return (
     <aside className="w-16 h-full border-r border-border flex flex-col items-center justify-between py-5 flex-shrink-0 bg-bg relative z-50">
       <div className="w-9 h-9 rounded-full border-2 border-accent flex items-center justify-center">
@@ -40,26 +41,30 @@ const PortfolioSidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage,
       </nav>
 
       <div className="flex flex-col items-center gap-3">
-        {isLoggedIn && (
-          <button
-            className="w-8 h-8 border border-accent rounded-md flex items-center justify-center cursor-pointer transition-colors text-accent hover:bg-accent hover:text-bg"
-            onClick={onLogout}
-            title={t.logout}
-          >
-            <LogOut size={14} />
-          </button>
+        {showAdminButton && (
+          <>
+            {isLoggedIn && (
+              <button
+                className="w-8 h-8 border border-accent rounded-md flex items-center justify-center cursor-pointer transition-colors text-accent hover:bg-accent hover:text-bg"
+                onClick={onLogout}
+                title={t.logout}
+              >
+                <LogOut size={14} />
+              </button>
+            )}
+            <button
+              className={`w-8 h-8 border rounded-md flex items-center justify-center cursor-pointer transition-colors ${
+                isLoggedIn
+                  ? 'border-accent text-accent hover:bg-accent/10'
+                  : 'border-border text-muted-foreground hover:border-accent hover:text-accent'
+              }`}
+              onClick={onAdminClick}
+              title={isLoggedIn ? t.admin : t.login}
+            >
+              {isLoggedIn ? <Settings size={14} /> : <LogIn size={14} />}
+            </button>
+          </>
         )}
-        <button
-          className={`w-8 h-8 border rounded-md flex items-center justify-center cursor-pointer transition-colors ${
-            isLoggedIn
-              ? 'border-accent text-accent hover:bg-accent/10'
-              : 'border-border text-muted-foreground hover:border-accent hover:text-accent'
-          }`}
-          onClick={onAdminClick}
-          title={isLoggedIn ? t.admin : t.login}
-        >
-          {isLoggedIn ? <Settings size={14} /> : <LogIn size={14} />}
-        </button>
         <div className="w-px h-10 bg-border" />
       </div>
     </aside>

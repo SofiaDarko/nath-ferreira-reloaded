@@ -21,7 +21,7 @@ function loadState<T>(key: string, fallback: T): T {
   }
 }
 
-const Index: React.FC = () => {
+const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
   const [lang, setLang] = useState<Lang>('pt');
   const [currentPage, setCurrentPage] = useState<PageId>('home');
   const t = TRANSLATIONS[lang];
@@ -129,6 +129,7 @@ const Index: React.FC = () => {
         isLoggedIn={isLoggedIn}
         onLogout={handleLogout}
         t={t}
+        showAdminButton={!!showAdmin || isLoggedIn}
       />
 
       <LanguageSwitcher lang={lang} setLang={setLang} />
