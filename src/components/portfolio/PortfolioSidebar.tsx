@@ -14,7 +14,9 @@ interface SidebarProps {
 const PortfolioSidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, onAdminClick, isLoggedIn, onLogout, t }) => {
   return (
     <aside className="w-16 h-full border-r border-border flex flex-col items-center justify-between py-5 flex-shrink-0 bg-bg relative z-50">
-      <div className="font-display text-[9px] font-bold tracking-[0.2em] uppercase text-accent">NF</div>
+      <div className="w-9 h-9 rounded-full border-2 border-accent flex items-center justify-center">
+        <span className="font-display text-[9px] font-bold tracking-[0.2em] uppercase text-accent">NF</span>
+      </div>
 
       <nav className="flex flex-col -my-px">
         {([
@@ -24,10 +26,10 @@ const PortfolioSidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage,
         ]).map((page) => (
           <div
             key={page.id}
-            className={`writing-vertical transform rotate-180 font-display text-[10px] font-normal tracking-[0.18em] uppercase cursor-pointer py-6 px-3.5 transition-all border border-b-0 last:border-b ${
+            className={`writing-vertical transform rotate-180 font-display text-[10px] font-normal tracking-[0.18em] uppercase cursor-pointer py-6 px-3.5 transition-all ${
               currentPage === page.id
-                ? 'bg-accent text-[#2a2a2a] border-accent z-10'
-                : 'text-muted-foreground border-border hover:bg-accent hover:text-[#2a2a2a] hover:border-accent hover:z-10'
+                ? 'bg-accent text-[#2a2a2a] z-10'
+                : 'text-muted-foreground hover:bg-accent hover:text-[#2a2a2a] hover:z-10'
             }`}
             onClick={() => setCurrentPage(page.id)}
             role="button"
