@@ -126,7 +126,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ isEditing, editableTexts, onTextC
         ))}
       </div>
       {/* Nav arrows */}
-      <div className="absolute top-1/2 -translate-y-1/2 right-8 flex gap-3 z-10">
+      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-3 z-10">
         <button className="w-10 h-10 border border-border rounded-full flex items-center justify-center cursor-pointer text-fg transition-colors hover:border-accent hover:text-accent bg-bg/50 backdrop-blur-sm" onClick={prevPanel}><ArrowLeft size={16} /></button>
         <button className="w-10 h-10 border border-border rounded-full flex items-center justify-center cursor-pointer text-fg transition-colors hover:border-accent hover:text-accent bg-bg/50 backdrop-blur-sm" onClick={nextPanel}><ArrowRight size={16} /></button>
       </div>
