@@ -49,12 +49,47 @@ const Index: React.FC = () => {
   useEffect(() => { localStorage.setItem('nf_theme', JSON.stringify(theme)); }, [theme]);
   useEffect(() => { localStorage.setItem('nf_settings', JSON.stringify(globalSettings)); }, [globalSettings]);
 
-  // SEO
+  // SEO — dynamic head updates per language
   useEffect(() => {
-    document.title = lang === 'en'
-      ? 'Nath Ferreira | Visual Identity & Branding Specialist'
-      : 'Nath Ferreira | Identidade Visual & Branding';
-    document.documentElement.lang = lang;
+    const isEn = lang === 'en';
+    document.documentElement.lang = isEn ? 'en-GB' : 'pt-BR';
+    document.title = isEn
+      ? 'Nath Ferreira — Graphic Designer | Visual Identity & Branding Freelancer UK'
+      : 'Nath Ferreira — Designer Gráfica | Identidade Visual, Branding & Freelancer';
+
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+      metaDesc.setAttribute('content', isEn
+        ? 'Nath Ferreira is a freelance graphic designer specialising in visual identity, branding, logos and campaigns for companies and agencies. Based in the UK, available worldwide.'
+        : 'Nath Ferreira é designer gráfica freelancer especialista em identidade visual, branding, logotipos e campanhas para empresas e agências. Portfólio completo e contato para orçamentos.'
+      );
+    }
+
+    const metaKeywords = document.querySelector('meta[name="keywords"]');
+    if (metaKeywords) {
+      metaKeywords.setAttribute('content', isEn
+        ? 'graphic designer, visual identity, branding, logo design, freelance designer UK, brand creation, agency designer, design portfolio, Nath Ferreira'
+        : 'designer gráfica, identidade visual, branding, logotipo, criação de marca, design freelancer, designer para agências, portfólio design gráfico, designer freelancer Brasil, Nath Ferreira'
+      );
+    }
+
+    const geoRegion = document.querySelector('meta[name="geo.region"]');
+    if (geoRegion) geoRegion.setAttribute('content', isEn ? 'GB' : 'BR');
+    const geoPlace = document.querySelector('meta[name="geo.placename"]');
+    if (geoPlace) geoPlace.setAttribute('content', isEn ? 'United Kingdom' : 'Brasil');
+
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute('content', isEn
+      ? 'Nath Ferreira — Graphic Designer | Visual Identity & Branding'
+      : 'Nath Ferreira — Designer Gráfica | Identidade Visual & Branding'
+    );
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.setAttribute('content', isEn
+      ? 'Freelance graphic designer specialising in visual identity, branding and design for companies and agencies in the UK.'
+      : 'Designer gráfica freelancer especialista em identidade visual, branding e design para empresas e agências no Brasil.'
+    );
+    const ogLocale = document.querySelector('meta[property="og:locale"]');
+    if (ogLocale) ogLocale.setAttribute('content', isEn ? 'en_GB' : 'pt_BR');
   }, [lang]);
 
   const handleTextChange = (id: string, html: string) => {
