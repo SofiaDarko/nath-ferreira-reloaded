@@ -7,7 +7,7 @@ interface PasswordGateProps {
 }
 
 // SHA-256 hash of the admin password (not the password itself)
-const ADMIN_HASH = '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8';
+const ADMIN_HASH = '023c87f7c58822fe623be46438bf0abfd3973cdaf0bd0daafd5c59ad19a71d49';
 
 async function sha256(message: string): Promise<string> {
   const msgBuffer = new TextEncoder().encode(message);
