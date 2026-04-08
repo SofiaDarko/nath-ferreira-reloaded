@@ -204,6 +204,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                   <div className="border border-dashed border-border rounded-xl p-7 text-center cursor-pointer hover:border-accent transition-all relative">
                     <input type="file" accept="image/*" onChange={handleThumbUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
                     <p className="text-[13px] text-muted-foreground leading-relaxed">{lang === 'pt' ? 'Clique ou arraste' : 'Click or drag'}<br /><span className="text-accent font-medium">{lang === 'pt' ? 'imagem de capa' : 'cover image'}</span></p>
+                    <p className="text-[10px] text-muted-foreground/60 mt-2">{lang === 'pt' ? 'Tamanho ideal: 600 × 800 px' : 'Ideal size: 600 × 800 px'}</p>
                   </div>
                   {thumb && (
                     <div className="mt-2.5 relative w-16 h-16 rounded-lg overflow-hidden border border-border">
@@ -217,6 +218,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                   <div className="border border-dashed border-border rounded-xl p-7 text-center cursor-pointer hover:border-accent transition-all relative">
                     <input type="file" accept="image/*" multiple onChange={handleImagesUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
                     <p className="text-[13px] text-muted-foreground leading-relaxed">{lang === 'pt' ? 'Clique ou arraste' : 'Click or drag'}<br /><span className="text-accent font-medium">{lang === 'pt' ? 'múltiplas imagens' : 'multiple images'}</span></p>
+                    <p className="text-[10px] text-muted-foreground/60 mt-2">{lang === 'pt' ? 'Tamanho ideal: 1200 × 800 px' : 'Ideal size: 1200 × 800 px'}</p>
                   </div>
                   <div className="flex flex-wrap gap-2.5 mt-2.5">
                     {images.map((img, i) => (
@@ -261,6 +263,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
               <div className="border border-dashed border-border rounded-xl p-7 text-center cursor-pointer hover:border-accent transition-all relative mb-10">
                 <input type="file" accept="image/*" onChange={handlePhotoUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
                 <p className="text-[13px] text-muted-foreground">{lang === 'pt' ? 'Clique para enviar foto' : 'Click to upload photo'}</p>
+                <p className="text-[10px] text-muted-foreground/60 mt-2">{lang === 'pt' ? 'Tamanho ideal: 500 × 500 px' : 'Ideal size: 500 × 500 px'}</p>
               </div>
 
               <h3 className="font-display text-[10px] tracking-[0.18em] uppercase text-muted-foreground mb-6">{t.addSkill}</h3>
