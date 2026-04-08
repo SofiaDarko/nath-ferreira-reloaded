@@ -75,7 +75,7 @@ const HomePage: React.FC<HomePageProps> = ({ projects, onProjectClick, t, lang, 
         <p className="font-body text-[20px] font-light text-fg/55 mt-3.5 tracking-wide">
           {role} &nbsp;<span className="text-accent">|</span>&nbsp; {specialist}
         </p>
-        <div className="w-full h-px bg-border mt-7 -ml-[calc(theme(spacing.15)+40px)] " style={{ width: 'calc(100% + 40px + theme(spacing.15))' }} />
+        <div className="h-px bg-border mt-7 -ml-[40px]" style={{ width: 'calc(100% + 40px)' }} />
       </div>
 
       <div
