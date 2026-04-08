@@ -129,6 +129,7 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
         isLoggedIn={isLoggedIn}
         onLogout={handleLogout}
         t={t}
+        showAdminButton={!!showAdmin || isLoggedIn}
       />
 
       <LanguageSwitcher lang={lang} setLang={setLang} />
