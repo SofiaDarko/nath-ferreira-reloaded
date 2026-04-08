@@ -23,13 +23,14 @@ function ProjectCard({ project, onClick, index, lang }: { project: Project; onCl
     >
       {/* Border overlay visible on hover */}
       <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-accent transition-colors duration-300 z-20 pointer-events-none" />
-      <div className="absolute inset-0 rounded-2xl overflow-hidden">
+      <div className="absolute inset-0 rounded-2xl overflow-hidden image-protect-wrapper">
         <img
           src={project.thumb}
           alt={name}
-          className="w-full h-full object-cover block transition-all duration-500 group-hover:blur-sm group-hover:brightness-[0.45] group-hover:scale-105 pointer-events-none select-none"
+          className="w-full h-full object-cover block transition-all duration-500 group-hover:blur-sm group-hover:brightness-[0.45] group-hover:scale-105 protected-image"
           referrerPolicy="no-referrer"
           onDragStart={(e) => e.preventDefault()}
+          onContextMenu={(e) => e.preventDefault()}
         />
       </div>
       <div className="absolute inset-0 flex flex-col items-start justify-end p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 z-10">

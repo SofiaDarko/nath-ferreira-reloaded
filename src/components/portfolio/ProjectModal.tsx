@@ -42,7 +42,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose, lang }) =
 
         {/* Right image area */}
         <div className="flex-1 flex items-center justify-center p-10 relative overflow-hidden">
-          <div className="w-full h-full relative flex items-center justify-center">
+          <div className="w-full h-full relative flex items-center justify-center image-protect-wrapper">
             <AnimatePresence mode="wait">
               <motion.img
                 key={imgIdx}
@@ -52,7 +52,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose, lang }) =
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.97 }}
                 transition={{ duration: 0.4 }}
-                className="max-w-full max-h-full rounded-xl object-contain shadow-2xl pointer-events-none select-none"
+                className="max-w-full max-h-full rounded-xl object-contain shadow-2xl protected-image"
                 referrerPolicy="no-referrer"
                 onContextMenu={(e) => e.preventDefault()}
                 onDragStart={(e) => e.preventDefault()}
