@@ -144,10 +144,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const labelClass = "font-body text-[11px] tracking-widest uppercase text-muted-foreground";
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[500] bg-bg/98 backdrop-blur-2xl flex">
-      <div className="w-full h-full flex flex-col">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[500] flex items-center justify-center p-8" style={{ backgroundColor: `${theme.bg}80` }} onClick={onClose}>
+      <div className="w-full max-w-3xl max-h-[85vh] flex flex-col rounded-2xl border border-border overflow-hidden backdrop-blur-2xl" style={{ backgroundColor: `${theme.bg}cc` }} onClick={(e) => e.stopPropagation()}>
         {/* Header */}
-        <div className="flex items-center justify-between px-8 py-5 border-b border-border">
+        <div className="flex items-center justify-between px-8 py-5 border-b border-border flex-shrink-0">
           <h2 className="font-display text-[11px] tracking-[0.2em] uppercase text-accent">— {t.admin} —</h2>
           <button className="w-9 h-9 border border-border rounded-full flex items-center justify-center cursor-pointer text-fg transition-colors hover:border-accent hover:text-accent" onClick={onClose}>
             <X size={16} />
@@ -155,7 +155,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-border px-8">
+        <div className="flex border-b border-border px-8 flex-shrink-0">
           {tabs.map((tab) => (
             <button
               key={tab.id}
