@@ -1,0 +1,123 @@
+import type { Project, Skill, Experience, GlobalSettings, Theme } from '../types/portfolio';
+
+export const DEFAULT_THEME: Theme = {
+  bg: '#0a0a0a',
+  fg: '#ffffff',
+  accent: '#c8f564',
+  accent2: '#ff4d4d',
+  border: '#1c1c1c',
+  muted: '#666666',
+};
+
+export const DEFAULT_GLOBAL_SETTINGS: GlobalSettings = {
+  siteTitle: 'Nath Ferreira',
+  siteTitleEn: 'Nath Ferreira',
+  role: 'Designer Gráfica',
+  roleEn: 'Graphic Designer',
+  specialist: 'Especialista em Identidade Visual, Branding e Design Freelancer para Agências',
+  specialistEn: 'Visual Identity Specialist, Branding & Freelance Designer for Agencies',
+  hello: 'Olá, sou <em class="not-italic text-accent">Nath</em>.<br />Crio identidades<br />que ficam na<br />memória.',
+  helloEn: 'Hi, I\'m <em class="not-italic text-accent">Nath</em>.<br />I create identities<br />that stick in the<br />memory.',
+  letsCreate: 'Vamos<br />criar algo<br /><em class="not-italic text-accent">juntos.</em>',
+  letsCreateEn: 'Let\'s<br />create something<br /><em class="not-italic text-accent">together.</em>',
+};
+
+export const DEFAULT_SKILLS: Skill[] = [
+  { id: '1', name: 'Photoshop', icon: 'Ps', color: '#31a8ff', bg: '#001e36', special: false },
+  { id: '2', name: 'Illustrator', icon: 'Ai', color: '#ff9a00', bg: '#330000', special: false },
+  { id: '3', name: 'InDesign', icon: 'Id', color: '#ff3366', bg: '#2e0013', special: false },
+  { id: '4', name: 'Figma', icon: 'Figma', color: '#a259ff', bg: '#0d0d0d', special: true },
+  { id: '5', name: 'After Effects', icon: 'Ae', color: '#9999ff', bg: '#000033', special: false },
+  { id: '6', name: 'Premiere', icon: 'Pr', color: '#9999ff', bg: '#00003b', special: false },
+  { id: '7', name: 'Canva', icon: '◆', color: '#c8f564', bg: '#141414', special: true },
+  { id: '8', name: 'Lightroom', icon: 'Lr', color: '#31a8ff', bg: '#001d36', special: false },
+];
+
+export const DEFAULT_EXPERIENCES: Experience[] = [
+  {
+    id: '1',
+    period: '2023 — Presente',
+    title: 'Designer Gráfica Freelancer',
+    title_en: 'Freelance Graphic Designer',
+    company: 'Autônoma',
+    desc: 'Criação de identidades visuais, branding e materiais gráficos para empresas e agências.',
+    desc_en: 'Creating visual identities, branding, and graphic materials for companies and agencies.',
+  },
+  {
+    id: '2',
+    period: '2021 — 2023',
+    title: 'Designer Jr. em Agência',
+    title_en: 'Jr. Agency Designer',
+    company: 'Agência Criativa',
+    desc: 'Desenvolvimento de campanhas multicanal, social media e materiais impressos.',
+    desc_en: 'Development of multichannel campaigns, social media and print materials.',
+  },
+];
+
+export const DEFAULT_PROJECTS: Project[] = [
+  {
+    id: '1',
+    name: 'Studio Amora',
+    name_en: 'Studio Amora',
+    description: 'Identidade visual completa para estúdio de fotografia artística.',
+    description_en: 'Complete visual identity for an artistic photography studio.',
+    tags: ['Branding', 'Identidade Visual'],
+    thumb: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&q=80',
+      'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=1200&q=80',
+    ],
+  },
+  {
+    id: '2',
+    name: 'Café Botânico',
+    name_en: 'Botanical Café',
+    description: 'Branding e papelaria para cafeteria artesanal com conceito botânico.',
+    description_en: 'Branding and stationery for an artisanal café with botanical concept.',
+    tags: ['Branding', 'Editorial'],
+    thumb: 'https://images.unsplash.com/photo-1534312527009-56c7016453e6?w=600&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1534312527009-56c7016453e6?w=1200&q=80',
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&q=80',
+    ],
+  },
+  {
+    id: '3',
+    name: 'Onda Festival',
+    name_en: 'Wave Festival',
+    description: 'Campanha visual e key visuals para festival de música independente.',
+    description_en: 'Visual campaign and key visuals for independent music festival.',
+    tags: ['Campanha', 'KV', 'Social Media'],
+    thumb: 'https://images.unsplash.com/photo-1557672172-298e090bd0f1?w=600&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1557672172-298e090bd0f1?w=1200&q=80',
+      'https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=1200&q=80',
+    ],
+  },
+  {
+    id: '4',
+    name: 'Lume Cosméticos',
+    name_en: 'Lume Cosmetics',
+    description: 'Identidade visual e embalagens para linha de cosméticos naturais.',
+    description_en: 'Visual identity and packaging for natural cosmetics line.',
+    tags: ['Branding', 'Identidade Visual'],
+    thumb: 'https://images.unsplash.com/photo-1615529182904-14819c35db37?w=600&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1615529182904-14819c35db37?w=1200&q=80',
+      'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=1200&q=80',
+    ],
+  },
+  {
+    id: '5',
+    name: 'Tech Hub',
+    name_en: 'Tech Hub',
+    description: 'Website e social media para hub de tecnologia e inovação.',
+    description_en: 'Website and social media for technology and innovation hub.',
+    tags: ['Website', 'Social Media'],
+    thumb: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200&q=80',
+      'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80',
+    ],
+  },
+];
