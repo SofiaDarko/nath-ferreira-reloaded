@@ -26,7 +26,7 @@ const PortfolioSidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage,
         ]).map((page) => (
           <div
             key={page.id}
-            className={`writing-vertical transform rotate-180 font-display text-[10px] font-normal tracking-[0.18em] uppercase cursor-pointer py-6 px-3.5 transition-all ${
+            className={`writing-vertical transform rotate-180 font-display text-[10px] font-normal tracking-[0.18em] uppercase cursor-pointer py-6 px-3.5 transition-all border-b border-[hsl(0,0%,17%)] last:border-b-0 ${
               currentPage === page.id
                 ? 'bg-accent text-[#2a2a2a] z-10'
                 : 'text-muted-foreground hover:bg-accent hover:text-[#2a2a2a] hover:z-10'
