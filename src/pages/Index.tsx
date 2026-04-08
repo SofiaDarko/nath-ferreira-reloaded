@@ -1,16 +1,164 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import React, { useState, useEffect } from 'react';
+import { AnimatePresence } from 'motion/react';
+import PortfolioSidebar from '../components/portfolio/PortfolioSidebar';
+import LanguageSwitcher from '../components/portfolio/LanguageSwitcher';
+import HomePage from '../components/portfolio/HomePage';
+import AboutPage from '../components/portfolio/AboutPage';
+import ContactPage from '../components/portfolio/ContactPage';
+import ProjectModal from '../components/portfolio/ProjectModal';
+import PasswordGate from '../components/portfolio/PasswordGate';
+import AdminPanel from '../components/portfolio/AdminPanel';
+import { TRANSLATIONS } from '../data/translations';
+import { DEFAULT_THEME, DEFAULT_GLOBAL_SETTINGS, DEFAULT_SKILLS, DEFAULT_EXPERIENCES, DEFAULT_PROJECTS } from '../data/defaults';
+import type { Project, Skill, Experience, EditableTexts, Theme, GlobalSettings, PageId, Lang } from '../types/portfolio';
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+function loadState<T>(key: string, fallback: T): T {
+  try {
+    const saved = localStorage.getItem(key);
+    return saved ? JSON.parse(saved) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+const Index: React.FC = () => {
+  const [lang, setLang] = useState<Lang>('pt');
+  const [currentPage, setCurrentPage] = useState<PageId>('home');
+  const t = TRANSLATIONS[lang];
+
+  const [projects, setProjects] = useState<Project[]>(() => loadState('nf_projects', DEFAULT_PROJECTS));
+  const [skills, setSkills] = useState<Skill[]>(() => loadState('nf_skills', DEFAULT_SKILLS));
+  const [experiences, setExperiences] = useState<Experience[]>(() => loadState('nf_experiences', DEFAULT_EXPERIENCES));
+  const [editableTexts, setEditableTexts] = useState<EditableTexts>(() => loadState('nf_texts', {}));
+  const [userPhoto, setUserPhoto] = useState<string | null>(() => loadState('nf_photo', null));
+  const [theme, setTheme] = useState<Theme>(() => loadState('nf_theme', DEFAULT_THEME));
+  const [globalSettings, setGlobalSettings] = useState<GlobalSettings>(() => loadState('nf_settings', DEFAULT_GLOBAL_SETTINGS));
+
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [isPasswordGateOpen, setIsPasswordGateOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Persist to localStorage
+  useEffect(() => { localStorage.setItem('nf_projects', JSON.stringify(projects)); }, [projects]);
+  useEffect(() => { localStorage.setItem('nf_skills', JSON.stringify(skills)); }, [skills]);
+  useEffect(() => { localStorage.setItem('nf_experiences', JSON.stringify(experiences)); }, [experiences]);
+  useEffect(() => { localStorage.setItem('nf_texts', JSON.stringify(editableTexts)); }, [editableTexts]);
+  useEffect(() => { localStorage.setItem('nf_photo', JSON.stringify(userPhoto)); }, [userPhoto]);
+  useEffect(() => { localStorage.setItem('nf_theme', JSON.stringify(theme)); }, [theme]);
+  useEffect(() => { localStorage.setItem('nf_settings', JSON.stringify(globalSettings)); }, [globalSettings]);
+
+  // SEO
+  useEffect(() => {
+    document.title = lang === 'en'
+      ? 'Nath Ferreira | Visual Identity & Branding Specialist'
+      : 'Nath Ferreira | Identidade Visual & Branding';
+    document.documentElement.lang = lang;
+  }, [lang]);
+
+  const handleTextChange = (id: string, html: string) => {
+    setEditableTexts((prev) => ({ ...prev, [id]: html }));
+  };
+
+  const handleLogout = () => {
+    setIsAdminOpen(false);
+    setIsEditing(false);
+    setIsLoggedIn(false);
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="flex h-screen w-screen overflow-hidden font-body" style={{ backgroundColor: theme.bg, color: theme.fg }}>
+      {/* Dynamic theme CSS variables */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        :root {
+          --theme-bg: ${theme.bg};
+          --theme-fg: ${theme.fg};
+          --theme-accent: ${theme.accent};
+          --theme-accent2: ${theme.accent2};
+          --theme-border: ${theme.border};
+          --theme-muted: ${theme.muted};
+        }
+      `}} />
+
+      <PortfolioSidebar
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        onAdminClick={() => {
+          if (isLoggedIn) {
+            setIsAdminOpen(true);
+          } else {
+            setIsPasswordGateOpen(true);
+          }
+        }}
+        isLoggedIn={isLoggedIn}
+        onLogout={handleLogout}
+        t={t}
+      />
+
+      <LanguageSwitcher lang={lang} setLang={setLang} />
+
+      <main className="flex-1 relative overflow-hidden">
+        <AnimatePresence mode="wait">
+          {currentPage === 'home' && (
+            <HomePage key="home" projects={projects} onProjectClick={setSelectedProject} t={t} lang={lang} globalSettings={globalSettings} />
+          )}
+          {currentPage === 'about' && (
+            <AboutPage
+              key="about"
+              isEditing={isEditing}
+              editableTexts={editableTexts}
+              onTextChange={handleTextChange}
+              userPhoto={userPhoto}
+              skills={skills}
+              experiences={experiences}
+              t={t}
+              lang={lang}
+              globalSettings={globalSettings}
+            />
+          )}
+          {currentPage === 'contact' && (
+            <ContactPage key="contact" isEditing={isEditing} editableTexts={editableTexts} onTextChange={handleTextChange} t={t} lang={lang} globalSettings={globalSettings} />
+          )}
+        </AnimatePresence>
+      </main>
+
+      <AnimatePresence>
+        {selectedProject && <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} lang={lang} />}
+        {isPasswordGateOpen && (
+          <PasswordGate
+            onSuccess={() => {
+              setIsPasswordGateOpen(false);
+              setIsAdminOpen(true);
+              setIsEditing(true);
+              setIsLoggedIn(true);
+            }}
+            onClose={() => setIsPasswordGateOpen(false)}
+          />
+        )}
+        {isAdminOpen && (
+          <AdminPanel
+            projects={projects}
+            setProjects={setProjects}
+            onClose={() => setIsAdminOpen(false)}
+            setUserPhoto={setUserPhoto}
+            skills={skills}
+            setSkills={setSkills}
+            experiences={experiences}
+            setExperiences={setExperiences}
+            editableTexts={editableTexts}
+            onTextChange={handleTextChange}
+            t={t}
+            lang={lang}
+            theme={theme}
+            setTheme={setTheme}
+            globalSettings={globalSettings}
+            setGlobalSettings={setGlobalSettings}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
