@@ -9,10 +9,18 @@ export interface Project {
   images: string[];
 }
 
+export interface SocialLink {
+  id: string;
+  label: string;
+  url: string;
+  text?: string;
+}
+
 export interface Skill {
   id: string;
   name: string;
   icon: string;
+  iconUrl?: string;
   color: string;
   bg: string;
   special?: boolean;
@@ -42,6 +50,7 @@ export interface Theme {
   titleColor: string;
   subtitleColor: string;
   cardBg: string;
+  cardBorder: string;
   tagBg: string;
   tagText: string;
   hoverBorder: string;

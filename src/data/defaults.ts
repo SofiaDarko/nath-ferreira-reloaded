@@ -1,4 +1,4 @@
-import type { Project, Skill, Experience, GlobalSettings, Theme } from '../types/portfolio';
+import type { Project, Skill, Experience, GlobalSettings, Theme, SocialLink } from '../types/portfolio';
 
 export const DEFAULT_THEME: Theme = {
   bg: '#0a0a0a',
@@ -10,6 +10,7 @@ export const DEFAULT_THEME: Theme = {
   titleColor: '#ffffff',
   subtitleColor: '#ffffff88',
   cardBg: '#161616',
+  cardBorder: '#c8f564',
   tagBg: '#c8f56426',
   tagText: '#c8f564',
   hoverBorder: '#c8f564',
@@ -79,6 +80,13 @@ export const DEFAULT_EXPERIENCES: Experience[] = [
     desc: 'Desenvolvimento de campanhas multicanal, social media e materiais impressos.',
     desc_en: 'Development of multichannel campaigns, social media and print materials.',
   },
+];
+
+export const DEFAULT_SOCIAL_LINKS: SocialLink[] = [
+  { id: '1', label: 'Email', url: 'mailto:seu@email.com', text: 'seu@email.com' },
+  { id: '2', label: 'LinkedIn', url: 'https://linkedin.com/in/seu-linkedin', text: 'linkedin.com/in/seu' },
+  { id: '3', label: 'Instagram', url: 'https://instagram.com/seu-instagram', text: '@seu-instagram' },
+  { id: '4', label: 'Behance', url: 'https://behance.net/seu-behance', text: 'behance.net/seu' },
 ];
 
 export const DEFAULT_PROJECTS: Project[] = [
