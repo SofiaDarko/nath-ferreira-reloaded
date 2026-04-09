@@ -39,6 +39,13 @@ export interface Theme {
   accent2: string;
   border: string;
   muted: string;
+  titleColor: string;
+  subtitleColor: string;
+  cardBg: string;
+  tagBg: string;
+  tagText: string;
+  hoverBorder: string;
+  linkColor: string;
 }
 
 export interface GlobalSettings {
@@ -52,6 +59,31 @@ export interface GlobalSettings {
   helloEn: string;
   letsCreate: string;
   letsCreateEn: string;
+  // Nav labels
+  navHome: string;
+  navHomeEn: string;
+  navAbout: string;
+  navAboutEn: string;
+  navContact: string;
+  navContactEn: string;
+  // Section titles
+  skillsTitle: string;
+  skillsTitleEn: string;
+  educationTitle: string;
+  educationTitleEn: string;
+  experiencesTitle: string;
+  experiencesTitleEn: string;
+  // Drag hint
+  dragHint: string;
+  dragHintEn: string;
+  // Bio placeholder
+  bioDefault: string;
+  bioDefaultEn: string;
+  // Contact labels
+  contactEmail: string;
+  contactLinkedin: string;
+  contactInstagram: string;
+  contactBehance: string;
 }
 
 export type PageId = 'home' | 'about' | 'contact';

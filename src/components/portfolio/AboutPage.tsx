@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import EditableText from './EditableText';
 import type { Skill, Experience, EditableTexts, GlobalSettings } from '../../types/portfolio';
@@ -25,6 +25,10 @@ const AboutPage: React.FC<AboutPageProps> = ({ isEditing, editableTexts, onTextC
 
   const role = lang === 'en' ? globalSettings.roleEn : globalSettings.role;
   const hello = lang === 'en' ? globalSettings.helloEn : globalSettings.hello;
+  const skillsTitle = lang === 'en' ? globalSettings.skillsTitleEn : globalSettings.skillsTitle;
+  const educationTitle = lang === 'en' ? globalSettings.educationTitleEn : globalSettings.educationTitle;
+  const experiencesTitle = lang === 'en' ? globalSettings.experiencesTitleEn : globalSettings.experiencesTitle;
+  const bioPlaceholder = lang === 'en' ? globalSettings.bioDefaultEn : globalSettings.bioDefault;
 
   return (
     <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full relative overflow-hidden">
@@ -50,14 +54,14 @@ const AboutPage: React.FC<AboutPageProps> = ({ isEditing, editableTexts, onTextC
             </div>
             <div className="max-w-xl">
               <h2 className="font-display text-[clamp(28px,3.5vw,52px)] font-normal leading-[1.08] tracking-tight mb-6" dangerouslySetInnerHTML={{ __html: hello }} />
-              <EditableText id={`about-bio-${lang}`} isEditing={isEditing} value={editableTexts[`about-bio-${lang}`] || t.bioPlaceholder} onChange={onTextChange} className="text-sm leading-relaxed text-fg/60 max-w-[480px]" />
+              <EditableText id={`about-bio-${lang}`} isEditing={isEditing} value={editableTexts[`about-bio-${lang}`] || bioPlaceholder} onChange={onTextChange} className="text-sm leading-relaxed text-fg/60 max-w-[480px]" />
             </div>
           </div>
         </div>
 
         {/* Panel 2: Skills */}
         <div className="w-[calc(100vw-64px)] h-full p-20 flex flex-col justify-center overflow-y-auto">
-          <div className="font-display text-[10px] font-normal tracking-[0.22em] uppercase text-accent mb-9">— {t.skills}</div>
+          <div className="font-display text-[10px] font-normal tracking-[0.22em] uppercase text-accent mb-9">— {skillsTitle}</div>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(110px,1fr))] gap-3.5 max-w-[660px] mb-12">
             {skills.map((skill, i) => {
               const isFigma = skill.icon === 'Figma';
@@ -84,7 +88,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ isEditing, editableTexts, onTextC
               );
             })}
           </div>
-          <div className="font-display text-[10px] font-normal tracking-[0.22em] uppercase text-accent mb-9">— {t.education}</div>
+          <div className="font-display text-[10px] font-normal tracking-[0.22em] uppercase text-accent mb-9">— {educationTitle}</div>
           <div className="flex flex-col gap-7 max-w-[680px]">
             <div className="grid grid-cols-[130px,1fr] gap-7 pb-7 border-b border-border last:border-0">
               <EditableText id={`edu-period-${lang}`} isEditing={isEditing} value={editableTexts[`edu-period-${lang}`] || t.eduPeriod} onChange={onTextChange} className="font-display text-[10px] text-muted-foreground tracking-wide pt-1" />
@@ -99,7 +103,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ isEditing, editableTexts, onTextC
 
         {/* Panel 3: Experience */}
         <div className="w-[calc(100vw-64px)] h-full p-20 flex flex-col justify-center overflow-y-auto">
-          <div className="font-display text-[10px] font-normal tracking-[0.22em] uppercase text-accent mb-9">— {t.experiences}</div>
+          <div className="font-display text-[10px] font-normal tracking-[0.22em] uppercase text-accent mb-9">— {experiencesTitle}</div>
           <div className="flex flex-col gap-7 max-w-[680px]">
             {experiences.map((exp) => {
               const title = lang === 'en' && exp.title_en ? exp.title_en : exp.title;
