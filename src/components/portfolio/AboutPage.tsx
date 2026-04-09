@@ -74,7 +74,9 @@ const AboutPage: React.FC<AboutPageProps> = ({ isEditing, editableTexts, onTextC
                   transition={isFigma ? {} : { duration: 0.4, delay: i * 0.05, ease: 'easeOut' }}
                   className="flex flex-col items-center gap-2.5 p-4.5 border border-border rounded-xl font-body text-[10px] text-muted-foreground tracking-wider uppercase transition-colors hover:border-accent hover:text-fg"
                 >
-                  {skill.special ? (
+                  {skill.iconUrl ? (
+                    <img src={skill.iconUrl} alt={skill.name} className="w-7 h-7 object-contain" />
+                  ) : skill.special ? (
                     skill.icon === 'Figma' ? (
                       <svg className="w-7 h-7" viewBox="0 0 32 32"><rect width="32" height="32" rx="5" fill="#0d0d0d" /><circle cx="22" cy="10" r="4" fill="#a259ff" /><circle cx="16" cy="22" r="3" fill="#0acf83" /><path d="M8 24L16 8l8 16" stroke="#1abcfe" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>
                     ) : (
@@ -109,13 +111,18 @@ const AboutPage: React.FC<AboutPageProps> = ({ isEditing, editableTexts, onTextC
               const title = lang === 'en' && exp.title_en ? exp.title_en : exp.title;
               const desc = lang === 'en' && exp.desc_en ? exp.desc_en : exp.desc;
               return (
-                <div key={exp.id} className="grid grid-cols-[130px,1fr] gap-7 pb-7 border-b border-border last:border-0">
+                <div key={exp.id} className="group relative grid grid-cols-[130px,1fr] gap-7 pb-7 border-b border-border last:border-0">
                   <div className="font-display text-[10px] text-muted-foreground tracking-wide pt-1">{exp.period}</div>
                   <div>
                     <div className="font-display text-[15px] font-normal mb-1 tracking-tight">{title}</div>
                     <div className="text-xs text-accent mb-2 font-medium tracking-wide">{exp.company}</div>
                     <div className="text-[13px] leading-relaxed text-fg/55">{desc}</div>
                   </div>
+                  {isEditing && (
+                    <button className="absolute -right-12 top-1 w-8 h-8 flex items-center justify-center rounded border border-border text-muted-foreground hover:border-accent hover:text-accent transition-colors opacity-0 group-hover:opacity-100" title="Delete experience">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+                  )}
                 </div>
               );
             })}

@@ -166,7 +166,7 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
             />
           )}
           {currentPage === 'contact' && (
-            <ContactPage key="contact" isEditing={isEditing} editableTexts={editableTexts} onTextChange={handleTextChange} t={t} lang={lang} globalSettings={globalSettings} />
+            <ContactPage key="contact" isEditing={isEditing} editableTexts={editableTexts} onTextChange={handleTextChange} t={t} lang={lang} globalSettings={globalSettings} socialLinks={socialLinks} />
           )}
         </AnimatePresence>
       </main>
