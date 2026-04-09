@@ -143,7 +143,7 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
 
       <LanguageSwitcher lang={lang} setLang={setLang} />
 
-      <main className="flex-1 relative overflow-hidden pl-[40px]">
+      <main className="flex-1 relative overflow-hidden">
         <AnimatePresence mode="wait">
           {currentPage === 'home' && (
             <HomePage key="home" projects={projects} onProjectClick={setSelectedProject} t={t} lang={lang} globalSettings={globalSettings} />
