@@ -7,6 +7,13 @@ export const DEFAULT_THEME: Theme = {
   accent2: '#ff4d4d',
   border: '#1c1c1c',
   muted: '#666666',
+  titleColor: '#ffffff',
+  subtitleColor: '#ffffff88',
+  cardBg: '#161616',
+  tagBg: '#c8f56426',
+  tagText: '#c8f564',
+  hoverBorder: '#c8f564',
+  linkColor: '#c8f564',
 };
 
 export const DEFAULT_GLOBAL_SETTINGS: GlobalSettings = {
@@ -20,6 +27,26 @@ export const DEFAULT_GLOBAL_SETTINGS: GlobalSettings = {
   helloEn: 'Hi, I\'m <em class="not-italic text-accent">Nath</em>.<br />I create identities<br />that stick in the<br />memory.',
   letsCreate: 'Vamos<br />criar algo<br /><em class="not-italic text-accent">juntos.</em>',
   letsCreateEn: 'Let\'s<br />create something<br /><em class="not-italic text-accent">together.</em>',
+  navHome: 'Home',
+  navHomeEn: 'Home',
+  navAbout: 'Sobre',
+  navAboutEn: 'About',
+  navContact: 'Contato',
+  navContactEn: 'Contact',
+  skillsTitle: 'Habilidades & Ferramentas',
+  skillsTitleEn: 'Skills & Tools',
+  educationTitle: 'Formação Acadêmica',
+  educationTitleEn: 'Academic Background',
+  experiencesTitle: 'Experiências',
+  experiencesTitleEn: 'Experience',
+  dragHint: 'Arraste para explorar',
+  dragHintEn: 'Drag to explore',
+  bioDefault: 'Escreva aqui sua apresentação. Clique para editar quando o painel admin estiver aberto.',
+  bioDefaultEn: 'Write your bio here. Click to edit when the admin panel is open.',
+  contactEmail: 'seu@email.com',
+  contactLinkedin: 'linkedin.com/in/nathferreira',
+  contactInstagram: '@nathferreira',
+  contactBehance: 'behance.net/nathferreira',
 };
 
 export const DEFAULT_SKILLS: Skill[] = [

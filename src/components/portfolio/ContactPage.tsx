@@ -21,10 +21,10 @@ const ContactPage: React.FC<ContactPageProps> = ({ isEditing, editableTexts, onT
         <h2 className="font-display text-[clamp(40px,5vw,72px)] font-normal leading-none tracking-tight mb-10" dangerouslySetInnerHTML={{ __html: letsCreate }} />
         <div className="flex flex-col">
           {[
-            { label: 'Email', id: 'contact-email', default: 'seu@email.com' },
-            { label: 'LinkedIn', id: 'contact-linkedin', default: 'linkedin.com/in/nathferreira' },
-            { label: 'Instagram', id: 'contact-instagram', default: '@nathferreira' },
-            { label: 'Behance', id: 'contact-behance', default: 'behance.net/nathferreira' },
+            { label: 'Email', id: 'contact-email', default: globalSettings.contactEmail },
+            { label: 'LinkedIn', id: 'contact-linkedin', default: globalSettings.contactLinkedin },
+            { label: 'Instagram', id: 'contact-instagram', default: globalSettings.contactInstagram },
+            { label: 'Behance', id: 'contact-behance', default: globalSettings.contactBehance },
           ].map((link) => (
             <div key={link.id} className="group flex items-center justify-between py-5 border-b border-border transition-colors hover:text-accent">
               <div>
