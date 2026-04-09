@@ -9,8 +9,8 @@ import ProjectModal from '../components/portfolio/ProjectModal';
 import PasswordGate from '../components/portfolio/PasswordGate';
 import AdminPanel from '../components/portfolio/AdminPanel';
 import { TRANSLATIONS } from '../data/translations';
-import { DEFAULT_THEME, DEFAULT_GLOBAL_SETTINGS, DEFAULT_SKILLS, DEFAULT_EXPERIENCES, DEFAULT_PROJECTS } from '../data/defaults';
-import type { Project, Skill, Experience, EditableTexts, Theme, GlobalSettings, PageId, Lang } from '../types/portfolio';
+import { DEFAULT_THEME, DEFAULT_GLOBAL_SETTINGS, DEFAULT_SKILLS, DEFAULT_EXPERIENCES, DEFAULT_PROJECTS, DEFAULT_SOCIAL_LINKS } from '../data/defaults';
+import type { Project, Skill, Experience, EditableTexts, Theme, GlobalSettings, PageId, Lang, SocialLink } from '../types/portfolio';
 
 function loadState<T>(key: string, fallback: T): T {
   try {
@@ -33,6 +33,7 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
   const [userPhoto, setUserPhoto] = useState<string | null>(() => loadState('nf_photo', null));
   const [theme, setTheme] = useState<Theme>(() => loadState('nf_theme', DEFAULT_THEME));
   const [globalSettings, setGlobalSettings] = useState<GlobalSettings>(() => loadState('nf_settings', DEFAULT_GLOBAL_SETTINGS));
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>(() => loadState('nf_social_links', DEFAULT_SOCIAL_LINKS));
 
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isPasswordGateOpen, setIsPasswordGateOpen] = useState(false);
@@ -48,6 +49,7 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
   useEffect(() => { localStorage.setItem('nf_photo', JSON.stringify(userPhoto)); }, [userPhoto]);
   useEffect(() => { localStorage.setItem('nf_theme', JSON.stringify(theme)); }, [theme]);
   useEffect(() => { localStorage.setItem('nf_settings', JSON.stringify(globalSettings)); }, [globalSettings]);
+  useEffect(() => { localStorage.setItem('nf_social_links', JSON.stringify(socialLinks)); }, [socialLinks]);
 
   // SEO — dynamic head updates per language
   useEffect(() => {
@@ -120,6 +122,7 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
           --theme-tag-text: ${theme.tagText};
           --theme-hover-border: ${theme.hoverBorder};
           --theme-link-color: ${theme.linkColor};
+          --theme-card-border: ${theme.cardBorder};
         }
       `}} />
 
@@ -163,7 +166,7 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
             />
           )}
           {currentPage === 'contact' && (
-            <ContactPage key="contact" isEditing={isEditing} editableTexts={editableTexts} onTextChange={handleTextChange} t={t} lang={lang} globalSettings={globalSettings} />
+            <ContactPage key="contact" isEditing={isEditing} editableTexts={editableTexts} onTextChange={handleTextChange} t={t} lang={lang} globalSettings={globalSettings} socialLinks={socialLinks} />
           )}
         </AnimatePresence>
       </main>
@@ -191,6 +194,8 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
             setSkills={setSkills}
             experiences={experiences}
             setExperiences={setExperiences}
+            socialLinks={socialLinks}
+            setSocialLinks={setSocialLinks}
             editableTexts={editableTexts}
             onTextChange={handleTextChange}
             t={t}

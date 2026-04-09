@@ -1,4 +1,4 @@
-import type { Project, Skill, Experience, GlobalSettings, Theme } from '../types/portfolio';
+import type { Project, Skill, Experience, GlobalSettings, Theme, SocialLink } from '../types/portfolio';
 
 export const DEFAULT_THEME: Theme = {
   bg: '#0a0a0a',
@@ -14,6 +14,7 @@ export const DEFAULT_THEME: Theme = {
   tagText: '#c8f564',
   hoverBorder: '#c8f564',
   linkColor: '#c8f564',
+  cardBorder: '#c8f564',
 };
 
 export const DEFAULT_GLOBAL_SETTINGS: GlobalSettings = {
@@ -147,4 +148,11 @@ export const DEFAULT_PROJECTS: Project[] = [
       'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80',
     ],
   },
+];
+
+export const DEFAULT_SOCIAL_LINKS: SocialLink[] = [
+  { id: 'email', label: 'Email', url: 'mailto:seu@email.com', text: 'seu@email.com' },
+  { id: 'linkedin', label: 'LinkedIn', url: 'https://linkedin.com/in/nathferreira', text: 'linkedin.com/in/nathferreira' },
+  { id: 'instagram', label: 'Instagram', url: 'https://instagram.com/nathferreira', text: '@nathferreira' },
+  { id: 'behance', label: 'Behance', url: 'https://behance.net/nathferreira', text: 'behance.net/nathferreira' },
 ];

@@ -16,6 +16,14 @@ export interface Skill {
   color: string;
   bg: string;
   special?: boolean;
+  iconUrl?: string;
+}
+
+export interface SocialLink {
+  id: string;
+  label: string;
+  url: string;
+  text?: string;
 }
 
 export interface Experience {
@@ -46,6 +54,7 @@ export interface Theme {
   tagText: string;
   hoverBorder: string;
   linkColor: string;
+  cardBorder: string;
 }
 
 export interface GlobalSettings {
