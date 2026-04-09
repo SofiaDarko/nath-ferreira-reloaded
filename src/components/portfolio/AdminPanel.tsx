@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { X, Plus, Trash2 } from 'lucide-react';
+import { X, Plus, Trash2, Pencil, ArrowUp, ArrowDown } from 'lucide-react';
 import { HexColorPicker } from 'react-colorful';
 import type { Project, Skill, Experience, EditableTexts, Theme, GlobalSettings } from '../../types/portfolio';
 import { TAG_OPTIONS } from '../../data/translations';
@@ -30,6 +30,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const [activeTab, setActiveTab] = useState<'projects' | 'about' | 'appearance' | 'globalTexts'>('projects');
 
   // Project Form
+  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [nameEn, setNameEn] = useState('');
   const [desc, setDesc] = useState('');
@@ -62,10 +63,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (ev) => {
-        const result = ev.target?.result as string;
-        if (result) setThumb(result);
-      };
+      reader.onload = (ev) => { const r = ev.target?.result as string; if (r) setThumb(r); };
       reader.readAsDataURL(file);
     }
   };
@@ -74,10 +72,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     const files = Array.from(e.target.files || []).sort((a, b) => a.name.localeCompare(b.name));
     files.forEach((file) => {
       const reader = new FileReader();
-      reader.onload = (ev) => {
-        const result = ev.target?.result as string;
-        if (result) setImages((prev) => [...prev, result]);
-      };
+      reader.onload = (ev) => { const r = ev.target?.result as string; if (r) setImages((prev) => [...prev, r]); };
       reader.readAsDataURL(file);
     });
   };
@@ -86,49 +81,61 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (ev) => {
-        const result = ev.target?.result as string;
-        if (result) setUserPhoto(result);
-      };
+      reader.onload = (ev) => { const r = ev.target?.result as string; if (r) setUserPhoto(r); };
       reader.readAsDataURL(file);
     }
   };
 
-  const saveProject = () => {
-    if (!name) return;
-    const newProject: Project = {
-      id: Date.now().toString(),
-      name,
-      name_en: nameEn || undefined,
-      description: desc,
-      description_en: descEn || undefined,
-      tags: selectedTags,
-      thumb: thumb || images[0] || '',
-      images: images.length > 0 ? images : (thumb ? [thumb] : []),
-    };
-    setProjects((prev) => [newProject, ...prev]);
+  const clearProjectForm = () => {
+    setEditingProjectId(null);
     setName(''); setNameEn(''); setDesc(''); setDescEn('');
     setSelectedTags([]); setThumb(null); setImages([]);
   };
 
+  const editProject = (p: Project) => {
+    setEditingProjectId(p.id);
+    setName(p.name); setNameEn(p.name_en || '');
+    setDesc(p.description); setDescEn(p.description_en || '');
+    setSelectedTags(p.tags); setThumb(p.thumb); setImages(p.images);
+  };
+
+  const saveProject = () => {
+    if (!name) return;
+    if (editingProjectId) {
+      setProjects((prev) => prev.map((p) => p.id === editingProjectId ? {
+        ...p, name, name_en: nameEn || undefined, description: desc, description_en: descEn || undefined,
+        tags: selectedTags, thumb: thumb || images[0] || p.thumb, images: images.length > 0 ? images : p.images,
+      } : p));
+    } else {
+      const newProject: Project = {
+        id: Date.now().toString(), name, name_en: nameEn || undefined, description: desc, description_en: descEn || undefined,
+        tags: selectedTags, thumb: thumb || images[0] || '', images: images.length > 0 ? images : (thumb ? [thumb] : []),
+      };
+      setProjects((prev) => [newProject, ...prev]);
+    }
+    clearProjectForm();
+  };
+
+  const moveProject = (index: number, direction: -1 | 1) => {
+    setProjects((prev) => {
+      const arr = [...prev];
+      const target = index + direction;
+      if (target < 0 || target >= arr.length) return prev;
+      [arr[index], arr[target]] = [arr[target], arr[index]];
+      return arr;
+    });
+  };
+
   const saveSkill = () => {
     if (!skillName) return;
-    const newSkill: Skill = {
-      id: Date.now().toString(),
-      name: skillName, icon: skillIcon || skillName.substring(0, 2),
-      color: skillColor, bg: skillBg, special: false,
-    };
+    const newSkill: Skill = { id: Date.now().toString(), name: skillName, icon: skillIcon || skillName.substring(0, 2), color: skillColor, bg: skillBg, special: false };
     setSkills((prev) => [...prev, newSkill]);
     setSkillName(''); setSkillIcon(''); setSkillColor('#ffffff'); setSkillBg('#141414');
   };
 
   const saveExperience = () => {
     if (!expTitle || !expPeriod) return;
-    const newExp: Experience = {
-      id: Date.now().toString(),
-      period: expPeriod, title: expTitle, title_en: expTitleEn || undefined,
-      company: expCompany, desc: expDesc, desc_en: expDescEn || undefined,
-    };
+    const newExp: Experience = { id: Date.now().toString(), period: expPeriod, title: expTitle, title_en: expTitleEn || undefined, company: expCompany, desc: expDesc, desc_en: expDescEn || undefined };
     setExperiences((prev) => [...prev, newExp]);
     setExpPeriod(''); setExpTitle(''); setExpTitleEn(''); setExpCompany(''); setExpDesc(''); setExpDescEn('');
   };
@@ -142,6 +149,58 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
 
   const inputClass = "w-full bg-[#111] border border-border rounded-lg text-fg font-body text-sm p-3 outline-none focus:border-accent transition-colors";
   const labelClass = "font-body text-[11px] tracking-widest uppercase text-muted-foreground";
+  const hintClass = "font-body text-[10px] text-muted-foreground/50 mt-0.5";
+
+  // Global text fields config with char suggestions
+  const globalTextFields: { key: keyof GlobalSettings; label: string; chars: number }[] = [
+    { key: 'siteTitle', label: `${t.siteTitle} (PT)`, chars: 25 },
+    { key: 'siteTitleEn', label: `${t.siteTitle} (EN)`, chars: 25 },
+    { key: 'role', label: 'Role (PT)', chars: 30 },
+    { key: 'roleEn', label: 'Role (EN)', chars: 30 },
+    { key: 'specialist', label: 'Specialist (PT)', chars: 80 },
+    { key: 'specialistEn', label: 'Specialist (EN)', chars: 80 },
+    { key: 'hello', label: `${t.helloText} (PT)`, chars: 120 },
+    { key: 'helloEn', label: `${t.helloText} (EN)`, chars: 120 },
+    { key: 'letsCreate', label: `${t.letsCreateText} (PT)`, chars: 80 },
+    { key: 'letsCreateEn', label: `${t.letsCreateText} (EN)`, chars: 80 },
+    { key: 'navHome', label: 'Nav Home (PT)', chars: 10 },
+    { key: 'navHomeEn', label: 'Nav Home (EN)', chars: 10 },
+    { key: 'navAbout', label: 'Nav Sobre (PT)', chars: 10 },
+    { key: 'navAboutEn', label: 'Nav About (EN)', chars: 10 },
+    { key: 'navContact', label: 'Nav Contato (PT)', chars: 10 },
+    { key: 'navContactEn', label: 'Nav Contact (EN)', chars: 10 },
+    { key: 'skillsTitle', label: lang === 'pt' ? 'Título Habilidades (PT)' : 'Skills Title (PT)', chars: 35 },
+    { key: 'skillsTitleEn', label: lang === 'pt' ? 'Título Habilidades (EN)' : 'Skills Title (EN)', chars: 35 },
+    { key: 'educationTitle', label: lang === 'pt' ? 'Título Formação (PT)' : 'Education Title (PT)', chars: 30 },
+    { key: 'educationTitleEn', label: lang === 'pt' ? 'Título Formação (EN)' : 'Education Title (EN)', chars: 30 },
+    { key: 'experiencesTitle', label: lang === 'pt' ? 'Título Experiências (PT)' : 'Experiences Title (PT)', chars: 25 },
+    { key: 'experiencesTitleEn', label: lang === 'pt' ? 'Título Experiências (EN)' : 'Experiences Title (EN)', chars: 25 },
+    { key: 'dragHint', label: lang === 'pt' ? 'Dica de arrastar (PT)' : 'Drag Hint (PT)', chars: 25 },
+    { key: 'dragHintEn', label: lang === 'pt' ? 'Dica de arrastar (EN)' : 'Drag Hint (EN)', chars: 25 },
+    { key: 'bioDefault', label: 'Bio Padrão (PT)', chars: 200 },
+    { key: 'bioDefaultEn', label: 'Bio Default (EN)', chars: 200 },
+    { key: 'contactEmail', label: 'Email', chars: 40 },
+    { key: 'contactLinkedin', label: 'LinkedIn', chars: 50 },
+    { key: 'contactInstagram', label: 'Instagram', chars: 30 },
+    { key: 'contactBehance', label: 'Behance', chars: 50 },
+  ];
+
+  // Color fields config
+  const colorFields: { key: keyof Theme; label: string }[] = [
+    { key: 'bg', label: t.bg },
+    { key: 'fg', label: t.fg },
+    { key: 'accent', label: t.accent_label },
+    { key: 'accent2', label: t.accent2_label },
+    { key: 'border', label: t.border_label },
+    { key: 'muted', label: t.muted_label },
+    { key: 'titleColor', label: lang === 'pt' ? 'Cor do Título' : 'Title Color' },
+    { key: 'subtitleColor', label: lang === 'pt' ? 'Cor do Subtítulo' : 'Subtitle Color' },
+    { key: 'cardBg', label: lang === 'pt' ? 'Fundo dos Cards' : 'Card Background' },
+    { key: 'tagBg', label: lang === 'pt' ? 'Fundo das Tags' : 'Tag Background' },
+    { key: 'tagText', label: lang === 'pt' ? 'Texto das Tags' : 'Tag Text' },
+    { key: 'hoverBorder', label: lang === 'pt' ? 'Borda Hover' : 'Hover Border' },
+    { key: 'linkColor', label: lang === 'pt' ? 'Cor dos Links' : 'Link Color' },
+  ];
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[500] flex items-center justify-center p-8" style={{ backgroundColor: `${theme.bg}80` }} onClick={onClose}>
@@ -171,23 +230,29 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
         <div className="flex-1 overflow-y-auto p-8">
           {activeTab === 'projects' && (
             <div className="max-w-2xl">
-              <h3 className="font-display text-[10px] tracking-[0.18em] uppercase text-muted-foreground mb-6">{t.addProject}</h3>
+              <h3 className="font-display text-[10px] tracking-[0.18em] uppercase text-muted-foreground mb-6">
+                {editingProjectId ? (lang === 'pt' ? 'Editando Projeto' : 'Editing Project') : t.addProject}
+              </h3>
               <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-1">
                   <label className={labelClass}>{t.projectName} (PT)</label>
                   <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: Branding Studio X" className={inputClass} />
+                  <span className={hintClass}>~30 caracteres</span>
                 </div>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-1">
                   <label className={labelClass}>{t.projectName} (EN)</label>
                   <input type="text" value={nameEn} onChange={(e) => setNameEn(e.target.value)} placeholder="Ex: Branding Studio X" className={inputClass} />
+                  <span className={hintClass}>~30 caracteres</span>
                 </div>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-1">
                   <label className={labelClass}>{t.projectDesc} (PT)</label>
                   <textarea value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="Descreva o projeto..." className={`${inputClass} min-h-[80px] resize-y`} />
+                  <span className={hintClass}>~120 caracteres</span>
                 </div>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-1">
                   <label className={labelClass}>{t.projectDesc} (EN)</label>
                   <textarea value={descEn} onChange={(e) => setDescEn(e.target.value)} placeholder="Describe the project..." className={`${inputClass} min-h-[80px] resize-y`} />
+                  <span className={hintClass}>~120 caracteres</span>
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className={labelClass}>{t.tags}</label>
@@ -229,9 +294,18 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                     ))}
                   </div>
                 </div>
-                <button className="bg-accent text-bg border-none rounded-lg py-3.5 px-7 font-display text-[10px] font-bold tracking-[0.14em] uppercase cursor-pointer transition-opacity hover:opacity-80 mt-1" onClick={saveProject}>
-                  {lang === 'pt' ? 'Publicar Projeto →' : 'Publish Project →'}
-                </button>
+                <div className="flex gap-3">
+                  <button className="bg-accent text-bg border-none rounded-lg py-3.5 px-7 font-display text-[10px] font-bold tracking-[0.14em] uppercase cursor-pointer transition-opacity hover:opacity-80 mt-1" onClick={saveProject}>
+                    {editingProjectId
+                      ? (lang === 'pt' ? 'Salvar Alterações →' : 'Save Changes →')
+                      : (lang === 'pt' ? 'Publicar Projeto →' : 'Publish Project →')}
+                  </button>
+                  {editingProjectId && (
+                    <button className="border border-border text-muted-foreground rounded-lg py-3.5 px-7 font-display text-[10px] font-bold tracking-[0.14em] uppercase cursor-pointer transition-opacity hover:opacity-80 mt-1" onClick={clearProjectForm}>
+                      {lang === 'pt' ? 'Cancelar' : 'Cancel'}
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Published projects list */}
@@ -240,16 +314,19 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                 {projects.length === 0 ? (
                   <p className="text-xs text-muted-foreground">{lang === 'pt' ? 'Nenhum projeto publicado ainda.' : 'No projects published yet.'}</p>
                 ) : (
-                  projects.map((p) => (
+                  projects.map((p, idx) => (
                     <div key={p.id} className="flex items-center gap-3.5 p-3.5 border border-border rounded-xl transition-colors hover:border-muted">
                       <img src={p.thumb} className="w-12 h-12 rounded-lg object-cover bg-muted flex-shrink-0" />
-                      <div className="flex-1">
-                        <h4 className="font-display text-[13px] font-normal mb-1 tracking-tight">{p.name}</h4>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-display text-[13px] font-normal mb-1 tracking-tight truncate">{p.name}</h4>
                         <p className="text-[11px] text-muted-foreground tracking-wide">{p.images.length} img · {p.tags.slice(0, 2).join(', ') || '—'}</p>
                       </div>
-                      <button className="bg-transparent text-accent2 border border-accent2/40 rounded-md py-1.5 px-3 font-body text-[11px] cursor-pointer transition-all hover:bg-accent2/10" onClick={() => setProjects((prev) => prev.filter((proj) => proj.id !== p.id))}>
-                        <Trash2 size={12} />
-                      </button>
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <button className="w-7 h-7 border border-border rounded-md flex items-center justify-center text-muted-foreground hover:text-fg hover:border-fg transition-colors" onClick={() => moveProject(idx, -1)} title="▲"><ArrowUp size={12} /></button>
+                        <button className="w-7 h-7 border border-border rounded-md flex items-center justify-center text-muted-foreground hover:text-fg hover:border-fg transition-colors" onClick={() => moveProject(idx, 1)} title="▼"><ArrowDown size={12} /></button>
+                        <button className="w-7 h-7 border border-accent/40 rounded-md flex items-center justify-center text-accent hover:bg-accent/10 transition-colors" onClick={() => editProject(p)} title={t.edit}><Pencil size={12} /></button>
+                        <button className="w-7 h-7 border border-accent2/40 rounded-md flex items-center justify-center text-accent2 hover:bg-accent2/10 transition-colors" onClick={() => setProjects((prev) => prev.filter((proj) => proj.id !== p.id))}><Trash2 size={12} /></button>
+                      </div>
                     </div>
                   ))
                 )}
@@ -279,7 +356,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                 </button>
               </div>
 
-              {/* Skills list */}
               <div className="flex flex-wrap gap-2 mb-10">
                 {skills.map((s) => (
                   <div key={s.id} className="flex items-center gap-2 px-3 py-1.5 border border-border rounded-full text-[11px] text-muted-foreground">
@@ -302,7 +378,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                 </button>
               </div>
 
-              {/* Experiences list */}
               <div className="flex flex-col gap-2.5 mt-6">
                 {experiences.map((exp) => (
                   <div key={exp.id} className="flex items-center justify-between p-3 border border-border rounded-xl">
@@ -318,17 +393,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
           )}
 
           {activeTab === 'appearance' && (
-            <div className="max-w-md">
+            <div className="max-w-xl">
               <h3 className="font-display text-[10px] tracking-[0.18em] uppercase text-muted-foreground mb-6">{t.colors}</h3>
               <div className="grid grid-cols-2 gap-4">
-                {([
-                  { key: 'bg' as keyof Theme, label: t.bg },
-                  { key: 'fg' as keyof Theme, label: t.fg },
-                  { key: 'accent' as keyof Theme, label: t.accent_label },
-                  { key: 'accent2' as keyof Theme, label: t.accent2_label },
-                  { key: 'border' as keyof Theme, label: t.border_label },
-                  { key: 'muted' as keyof Theme, label: t.muted_label },
-                ]).map((item) => (
+                {colorFields.map((item) => (
                   <div key={item.key} className="flex flex-col gap-2">
                     <label className={labelClass}>{item.label}</label>
                     <div className="flex items-center gap-2 cursor-pointer" onClick={() => setColorTarget(colorTarget === item.key ? null : item.key)}>
@@ -349,26 +417,24 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
           {activeTab === 'globalTexts' && (
             <div className="max-w-2xl flex flex-col gap-4">
               <h3 className="font-display text-[10px] tracking-[0.18em] uppercase text-muted-foreground mb-2">{t.globalTexts}</h3>
-              {([
-                { key: 'siteTitle', label: `${t.siteTitle} (PT)` },
-                { key: 'siteTitleEn', label: `${t.siteTitle} (EN)` },
-                { key: 'role', label: 'Role (PT)' },
-                { key: 'roleEn', label: 'Role (EN)' },
-                { key: 'specialist', label: 'Specialist (PT)' },
-                { key: 'specialistEn', label: 'Specialist (EN)' },
-                { key: 'hello', label: `${t.helloText} (PT)` },
-                { key: 'helloEn', label: `${t.helloText} (EN)` },
-                { key: 'letsCreate', label: `${t.letsCreateText} (PT)` },
-                { key: 'letsCreateEn', label: `${t.letsCreateText} (EN)` },
-              ] as { key: keyof GlobalSettings; label: string }[]).map((item) => (
-                <div key={item.key} className="flex flex-col gap-2">
+              {globalTextFields.map((item) => (
+                <div key={item.key} className="flex flex-col gap-1">
                   <label className={labelClass}>{item.label}</label>
-                  <input
-                    type="text"
-                    value={globalSettings[item.key]}
-                    onChange={(e) => setGlobalSettings((prev) => ({ ...prev, [item.key]: e.target.value }))}
-                    className={inputClass}
-                  />
+                  {item.chars > 100 ? (
+                    <textarea
+                      value={globalSettings[item.key]}
+                      onChange={(e) => setGlobalSettings((prev) => ({ ...prev, [item.key]: e.target.value }))}
+                      className={`${inputClass} min-h-[80px] resize-y`}
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      value={globalSettings[item.key]}
+                      onChange={(e) => setGlobalSettings((prev) => ({ ...prev, [item.key]: e.target.value }))}
+                      className={inputClass}
+                    />
+                  )}
+                  <span className={hintClass}>~{item.chars} caracteres</span>
                 </div>
               ))}
             </div>
