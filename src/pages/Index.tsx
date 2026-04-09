@@ -113,6 +113,13 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
           --theme-accent2: ${theme.accent2};
           --theme-border: ${theme.border};
           --theme-muted: ${theme.muted};
+          --theme-title-color: ${theme.titleColor};
+          --theme-subtitle-color: ${theme.subtitleColor};
+          --theme-card-bg: ${theme.cardBg};
+          --theme-tag-bg: ${theme.tagBg};
+          --theme-tag-text: ${theme.tagText};
+          --theme-hover-border: ${theme.hoverBorder};
+          --theme-link-color: ${theme.linkColor};
         }
       `}} />
 
@@ -130,6 +137,8 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
         onLogout={handleLogout}
         t={t}
         showAdminButton={!!showAdmin || isLoggedIn}
+        lang={lang}
+        globalSettings={globalSettings}
       />
 
       <LanguageSwitcher lang={lang} setLang={setLang} />
