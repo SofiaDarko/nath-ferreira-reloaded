@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { X, Plus, Trash2, Pencil, ArrowUp, ArrowDown } from 'lucide-react';
 import { HexColorPicker } from 'react-colorful';
-import type { Project, Skill, Experience, EditableTexts, Theme, GlobalSettings, SocialLink } from '../../types/portfolio';
+import type { Project, Skill, Experience, EditableTexts, Theme, GlobalSettings } from '../../types/portfolio';
 import { TAG_OPTIONS } from '../../data/translations';
 
 interface AdminPanelProps {
@@ -14,8 +14,6 @@ interface AdminPanelProps {
   setSkills: React.Dispatch<React.SetStateAction<Skill[]>>;
   experiences: Experience[];
   setExperiences: React.Dispatch<React.SetStateAction<Experience[]>>;
-  socialLinks: SocialLink[];
-  setSocialLinks: React.Dispatch<React.SetStateAction<SocialLink[]>>;
   editableTexts: EditableTexts;
   onTextChange: (id: string, html: string) => void;
   t: Record<string, string>;
@@ -27,7 +25,7 @@ interface AdminPanelProps {
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = ({
-  projects, setProjects, onClose, setUserPhoto, skills, setSkills, experiences, setExperiences, socialLinks, setSocialLinks, t, lang, theme, setTheme, globalSettings, setGlobalSettings,
+  projects, setProjects, onClose, setUserPhoto, skills, setSkills, experiences, setExperiences, t, lang, theme, setTheme, globalSettings, setGlobalSettings,
 }) => {
   const [activeTab, setActiveTab] = useState<'projects' | 'about' | 'appearance' | 'globalTexts'>('projects');
 
@@ -46,10 +44,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const [skillIcon, setSkillIcon] = useState('');
   const [skillColor, setSkillColor] = useState('#ffffff');
   const [skillBg, setSkillBg] = useState('#141414');
-  const [skillIconUrl, setSkillIconUrl] = useState<string | null>(null);
 
   // Experience Form
-  const [editingExpId, setEditingExpId] = useState<string | null>(null);
   const [expPeriod, setExpPeriod] = useState('');
   const [expTitle, setExpTitle] = useState('');
   const [expTitleEn, setExpTitleEn] = useState('');
@@ -86,15 +82,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     if (file) {
       const reader = new FileReader();
       reader.onload = (ev) => { const r = ev.target?.result as string; if (r) setUserPhoto(r); };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleSkillIconUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => { const r = ev.target?.result as string; if (r) setSkillIconUrl(r); };
       reader.readAsDataURL(file);
     }
   };
@@ -141,45 +128,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
 
   const saveSkill = () => {
     if (!skillName) return;
-    const newSkill: Skill = { 
-      id: Date.now().toString(), 
-      name: skillName, 
-      icon: skillIcon || skillName.substring(0, 2), 
-      color: skillColor, 
-      bg: skillBg, 
-      special: false,
-      iconUrl: skillIconUrl || undefined
-    };
+    const newSkill: Skill = { id: Date.now().toString(), name: skillName, icon: skillIcon || skillName.substring(0, 2), color: skillColor, bg: skillBg, special: false };
     setSkills((prev) => [...prev, newSkill]);
-    setSkillName(''); setSkillIcon(''); setSkillColor('#ffffff'); setSkillBg('#141414'); setSkillIconUrl(null);
+    setSkillName(''); setSkillIcon(''); setSkillColor('#ffffff'); setSkillBg('#141414');
   };
 
   const saveExperience = () => {
     if (!expTitle || !expPeriod) return;
-    if (editingExpId) {
-      setExperiences((prev) => prev.map((e) => e.id === editingExpId ? {
-        ...e, period: expPeriod, title: expTitle, title_en: expTitleEn || undefined, company: expCompany, desc: expDesc, desc_en: expDescEn || undefined
-      } : e));
-    } else {
-      const newExp: Experience = { id: Date.now().toString(), period: expPeriod, title: expTitle, title_en: expTitleEn || undefined, company: expCompany, desc: expDesc, desc_en: expDescEn || undefined };
-      setExperiences((prev) => [...prev, newExp]);
-    }
-    clearExpForm();
-  };
-
-  const clearExpForm = () => {
-    setEditingExpId(null);
+    const newExp: Experience = { id: Date.now().toString(), period: expPeriod, title: expTitle, title_en: expTitleEn || undefined, company: expCompany, desc: expDesc, desc_en: expDescEn || undefined };
+    setExperiences((prev) => [...prev, newExp]);
     setExpPeriod(''); setExpTitle(''); setExpTitleEn(''); setExpCompany(''); setExpDesc(''); setExpDescEn('');
-  };
-
-  const editExperience = (e: Experience) => {
-    setEditingExpId(e.id);
-    setExpPeriod(e.period);
-    setExpTitle(e.title);
-    setExpTitleEn(e.title_en || '');
-    setExpCompany(e.company);
-    setExpDesc(e.desc);
-    setExpDescEn(e.desc_en || '');
   };
 
   const tabs = [
@@ -238,7 +196,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     { key: 'titleColor', label: lang === 'pt' ? 'Cor do Título' : 'Title Color' },
     { key: 'subtitleColor', label: lang === 'pt' ? 'Cor do Subtítulo' : 'Subtitle Color' },
     { key: 'cardBg', label: lang === 'pt' ? 'Fundo dos Cards' : 'Card Background' },
-    { key: 'cardBorder', label: lang === 'pt' ? 'Borda dos Cards' : 'Card Border' },
     { key: 'tagBg', label: lang === 'pt' ? 'Fundo das Tags' : 'Tag Background' },
     { key: 'tagText', label: lang === 'pt' ? 'Texto das Tags' : 'Tag Text' },
     { key: 'hoverBorder', label: lang === 'pt' ? 'Borda Hover' : 'Hover Border' },
@@ -394,20 +351,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                   <input type="text" value={skillColor} onChange={(e) => setSkillColor(e.target.value)} placeholder="Cor do ícone" className={inputClass} />
                   <input type="text" value={skillBg} onChange={(e) => setSkillBg(e.target.value)} placeholder="Cor de fundo" className={inputClass} />
                 </div>
-                <div className="flex flex-col gap-2">
-                  <label className={labelClass}>{lang === 'pt' ? 'Ícone (URL/Imagem)' : 'Icon (URL/Image)'}</label>
-                  <div className="border border-dashed border-border rounded-xl p-5 text-center cursor-pointer hover:border-accent transition-all relative">
-                    <input type="file" accept="image/*" onChange={handleSkillIconUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
-                    <p className="text-[12px] text-muted-foreground">{lang === 'pt' ? 'Clique para enviar ícone' : 'Click to upload icon'}</p>
-                    <p className="text-[10px] text-muted-foreground/60 mt-1">{lang === 'pt' ? 'Ideal: 64 × 64 px ou quadrado' : 'Ideal: 64 × 64 px or square'}</p>
-                  </div>
-                  {skillIconUrl && (
-                    <div className="mt-2 relative w-12 h-12 rounded-lg overflow-hidden border border-border">
-                      <img src={skillIconUrl} className="w-full h-full object-cover" />
-                      <div className="absolute top-0.5 right-0.5 w-3.5 h-3.5 bg-accent2/90 rounded-full flex items-center justify-center cursor-pointer text-fg text-[9px] font-bold" onClick={() => setSkillIconUrl(null)}>✕</div>
-                    </div>
-                  )}
-                </div>
                 <button className="bg-accent text-bg rounded-lg py-2.5 px-5 font-display text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:opacity-80 w-fit" onClick={saveSkill}>
                   <Plus size={12} className="inline mr-1" />{t.addSkill}
                 </button>
@@ -422,7 +365,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                 ))}
               </div>
 
-              <h3 className="font-display text-[10px] tracking-[0.18em] uppercase text-muted-foreground mb-6">{editingExpId ? (lang === 'pt' ? 'Editando Experiência' : 'Editing Experience') : t.addExp}</h3>
+              <h3 className="font-display text-[10px] tracking-[0.18em] uppercase text-muted-foreground mb-6">{t.addExp}</h3>
               <div className="flex flex-col gap-3">
                 <input type="text" value={expPeriod} onChange={(e) => setExpPeriod(e.target.value)} placeholder="2023 — Presente" className={inputClass} />
                 <input type="text" value={expTitle} onChange={(e) => setExpTitle(e.target.value)} placeholder="Título (PT)" className={inputClass} />
@@ -430,29 +373,19 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                 <input type="text" value={expCompany} onChange={(e) => setExpCompany(e.target.value)} placeholder="Empresa" className={inputClass} />
                 <textarea value={expDesc} onChange={(e) => setExpDesc(e.target.value)} placeholder="Descrição (PT)" className={`${inputClass} min-h-[60px] resize-y`} />
                 <textarea value={expDescEn} onChange={(e) => setExpDescEn(e.target.value)} placeholder="Description (EN)" className={`${inputClass} min-h-[60px] resize-y`} />
-                <div className="flex gap-3 mt-1">
-                  <button className="bg-accent text-bg rounded-lg py-2.5 px-5 font-display text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:opacity-80 w-fit" onClick={saveExperience}>
-                    <Plus size={12} className="inline mr-1" />{editingExpId ? (lang === 'pt' ? 'Salvar Alterações' : 'Save Changes') : t.addExp}
-                  </button>
-                  {editingExpId && (
-                    <button className="border border-border text-muted-foreground rounded-lg py-2.5 px-5 font-display text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:opacity-80" onClick={clearExpForm}>
-                      {lang === 'pt' ? 'Cancelar' : 'Cancel'}
-                    </button>
-                  )}
-                </div>
+                <button className="bg-accent text-bg rounded-lg py-2.5 px-5 font-display text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:opacity-80 w-fit" onClick={saveExperience}>
+                  <Plus size={12} className="inline mr-1" />{t.addExp}
+                </button>
               </div>
 
               <div className="flex flex-col gap-2.5 mt-6">
                 {experiences.map((exp) => (
-                  <div key={exp.id} className="flex items-center justify-between p-3 border border-border rounded-xl hover:border-muted transition-colors">
-                    <div className="flex-1 min-w-0">
+                  <div key={exp.id} className="flex items-center justify-between p-3 border border-border rounded-xl">
+                    <div>
                       <div className="font-display text-[12px] tracking-tight">{exp.title}</div>
                       <div className="text-[10px] text-muted-foreground">{exp.company} · {exp.period}</div>
                     </div>
-                    <div className="flex items-center gap-1.5 flex-shrink-0 ml-3">
-                      <button className="w-7 h-7 border border-accent/40 rounded-md flex items-center justify-center text-accent hover:bg-accent/10 transition-colors" onClick={() => editExperience(exp)} title={t.edit}><Pencil size={12} /></button>
-                      <button className="w-7 h-7 border border-accent2/40 rounded-md flex items-center justify-center text-accent2 hover:bg-accent2/10 transition-colors" onClick={() => setExperiences((prev) => prev.filter((e) => e.id !== exp.id))}><Trash2 size={12} /></button>
-                    </div>
+                    <button className="text-accent2" onClick={() => setExperiences((prev) => prev.filter((e) => e.id !== exp.id))}><Trash2 size={12} /></button>
                   </div>
                 ))}
               </div>

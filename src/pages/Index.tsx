@@ -9,8 +9,8 @@ import ProjectModal from '../components/portfolio/ProjectModal';
 import PasswordGate from '../components/portfolio/PasswordGate';
 import AdminPanel from '../components/portfolio/AdminPanel';
 import { TRANSLATIONS } from '../data/translations';
-import { DEFAULT_THEME, DEFAULT_GLOBAL_SETTINGS, DEFAULT_SKILLS, DEFAULT_EXPERIENCES, DEFAULT_PROJECTS, DEFAULT_SOCIAL_LINKS } from '../data/defaults';
-import type { Project, Skill, Experience, EditableTexts, Theme, GlobalSettings, PageId, Lang, SocialLink } from '../types/portfolio';
+import { DEFAULT_THEME, DEFAULT_GLOBAL_SETTINGS, DEFAULT_SKILLS, DEFAULT_EXPERIENCES, DEFAULT_PROJECTS } from '../data/defaults';
+import type { Project, Skill, Experience, EditableTexts, Theme, GlobalSettings, PageId, Lang } from '../types/portfolio';
 
 function loadState<T>(key: string, fallback: T): T {
   try {
@@ -29,7 +29,6 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
   const [projects, setProjects] = useState<Project[]>(() => loadState('nf_projects', DEFAULT_PROJECTS));
   const [skills, setSkills] = useState<Skill[]>(() => loadState('nf_skills', DEFAULT_SKILLS));
   const [experiences, setExperiences] = useState<Experience[]>(() => loadState('nf_experiences', DEFAULT_EXPERIENCES));
-  const [socialLinks, setSocialLinks] = useState<SocialLink[]>(() => loadState('nf_social_links', DEFAULT_SOCIAL_LINKS));
   const [editableTexts, setEditableTexts] = useState<EditableTexts>(() => loadState('nf_texts', {}));
   const [userPhoto, setUserPhoto] = useState<string | null>(() => loadState('nf_photo', null));
   const [theme, setTheme] = useState<Theme>(() => loadState('nf_theme', DEFAULT_THEME));
@@ -45,7 +44,6 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
   useEffect(() => { localStorage.setItem('nf_projects', JSON.stringify(projects)); }, [projects]);
   useEffect(() => { localStorage.setItem('nf_skills', JSON.stringify(skills)); }, [skills]);
   useEffect(() => { localStorage.setItem('nf_experiences', JSON.stringify(experiences)); }, [experiences]);
-  useEffect(() => { localStorage.setItem('nf_social_links', JSON.stringify(socialLinks)); }, [socialLinks]);
   useEffect(() => { localStorage.setItem('nf_texts', JSON.stringify(editableTexts)); }, [editableTexts]);
   useEffect(() => { localStorage.setItem('nf_photo', JSON.stringify(userPhoto)); }, [userPhoto]);
   useEffect(() => { localStorage.setItem('nf_theme', JSON.stringify(theme)); }, [theme]);
@@ -118,7 +116,6 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
           --theme-title-color: ${theme.titleColor};
           --theme-subtitle-color: ${theme.subtitleColor};
           --theme-card-bg: ${theme.cardBg};
-          --theme-card-border: ${theme.cardBorder};
           --theme-tag-bg: ${theme.tagBg};
           --theme-tag-text: ${theme.tagText};
           --theme-hover-border: ${theme.hoverBorder};
@@ -146,7 +143,7 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
 
       <LanguageSwitcher lang={lang} setLang={setLang} />
 
-      <main className="flex-1 relative overflow-hidden">
+      <main className="flex-1 relative overflow-hidden pl-[40px]">
         <AnimatePresence mode="wait">
           {currentPage === 'home' && (
             <HomePage key="home" projects={projects} onProjectClick={setSelectedProject} t={t} lang={lang} globalSettings={globalSettings} />
@@ -166,7 +163,7 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
             />
           )}
           {currentPage === 'contact' && (
-            <ContactPage key="contact" isEditing={isEditing} editableTexts={editableTexts} onTextChange={handleTextChange} t={t} lang={lang} globalSettings={globalSettings} socialLinks={socialLinks} />
+            <ContactPage key="contact" isEditing={isEditing} editableTexts={editableTexts} onTextChange={handleTextChange} t={t} lang={lang} globalSettings={globalSettings} />
           )}
         </AnimatePresence>
       </main>
