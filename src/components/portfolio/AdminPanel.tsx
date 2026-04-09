@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { X, Plus, Trash2, Pencil, ArrowUp, ArrowDown } from 'lucide-react';
 import { HexColorPicker } from 'react-colorful';
-import type { Project, Skill, Experience, EditableTexts, Theme, GlobalSettings } from '../../types/portfolio';
+import type { Project, Skill, Experience, EditableTexts, Theme, GlobalSettings, SocialLink } from '../../types/portfolio';
 import { TAG_OPTIONS } from '../../data/translations';
 
 interface AdminPanelProps {
@@ -14,6 +14,8 @@ interface AdminPanelProps {
   setSkills: React.Dispatch<React.SetStateAction<Skill[]>>;
   experiences: Experience[];
   setExperiences: React.Dispatch<React.SetStateAction<Experience[]>>;
+  socialLinks: SocialLink[];
+  setSocialLinks: React.Dispatch<React.SetStateAction<SocialLink[]>>;
   editableTexts: EditableTexts;
   onTextChange: (id: string, html: string) => void;
   t: Record<string, string>;
@@ -25,7 +27,7 @@ interface AdminPanelProps {
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = ({
-  projects, setProjects, onClose, setUserPhoto, skills, setSkills, experiences, setExperiences, t, lang, theme, setTheme, globalSettings, setGlobalSettings,
+  projects, setProjects, onClose, setUserPhoto, skills, setSkills, experiences, setExperiences, socialLinks, setSocialLinks, t, lang, theme, setTheme, globalSettings, setGlobalSettings,
 }) => {
   const [activeTab, setActiveTab] = useState<'projects' | 'about' | 'appearance' | 'globalTexts'>('projects');
 
@@ -196,6 +198,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     { key: 'titleColor', label: lang === 'pt' ? 'Cor do Título' : 'Title Color' },
     { key: 'subtitleColor', label: lang === 'pt' ? 'Cor do Subtítulo' : 'Subtitle Color' },
     { key: 'cardBg', label: lang === 'pt' ? 'Fundo dos Cards' : 'Card Background' },
+    { key: 'cardBorder', label: lang === 'pt' ? 'Borda dos Cards' : 'Card Border' },
     { key: 'tagBg', label: lang === 'pt' ? 'Fundo das Tags' : 'Tag Background' },
     { key: 'tagText', label: lang === 'pt' ? 'Texto das Tags' : 'Tag Text' },
     { key: 'hoverBorder', label: lang === 'pt' ? 'Borda Hover' : 'Hover Border' },
