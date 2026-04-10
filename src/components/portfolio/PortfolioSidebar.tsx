@@ -22,7 +22,7 @@ const PortfolioSidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage,
   ];
 
   return (
-    <aside className="w-16 h-full border-r border-border flex flex-col justify-between py-5 flex-shrink-0 bg-bg relative z-50">
+    <aside className="w-16 h-full border-r border-border flex flex-col justify-between py-5 flex-shrink-0 bg-bg relative z-50" style={{ backgroundColor: 'hsl(var(--bg))' }}>
       <div className="flex items-center justify-center">
         <div className="w-9 h-9 rounded-full border-2 border-accent flex items-center justify-center">
           <span className="font-display text-[9px] font-bold tracking-[0.2em] uppercase text-accent">NF</span>
@@ -38,7 +38,7 @@ const PortfolioSidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage,
                 ? 'bg-accent text-[#2a2a2a]'
                 : 'text-muted-foreground hover:bg-accent hover:text-[#2a2a2a]'
             }`}
-            style={{ width: '100%' }}
+            style={{ width: '100%', color: currentPage !== page.id ? 'hsl(var(--muted-foreground))' : undefined }}
             onClick={() => setCurrentPage(page.id)}
             role="button"
           >
