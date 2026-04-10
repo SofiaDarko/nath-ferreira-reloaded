@@ -1,0 +1,28 @@
+name: Deploy to Lovable
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Trigger Lovable deploy
+        env:
+          LOVABLE_WEBHOOK: ${{ secrets.LOVABLE_WEBHOOK }}
+        run: |
+          if [ -z "$LOVABLE_WEBHOOK" ]; then
+            echo "LOVABLE_WEBHOOK secret is empty. Failing. Please set the webhook URL as the secret value (not a workflow)."
+            exit 1
+          fi
+          echo "Triggering Lovable deploy..."
+          curl -X POST -H "Content-Type: application/json" -d '{}' "$LOVABLE_WEBHOOK"
