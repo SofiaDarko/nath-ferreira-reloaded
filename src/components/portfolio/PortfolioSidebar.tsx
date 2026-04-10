@@ -22,20 +22,23 @@ const PortfolioSidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage,
   ];
 
   return (
-    <aside className="w-16 h-full border-r border-border flex flex-col items-center justify-between py-5 flex-shrink-0 bg-bg relative z-50">
-      <div className="w-9 h-9 rounded-full border-2 border-accent flex items-center justify-center">
-        <span className="font-display text-[9px] font-bold tracking-[0.2em] uppercase text-accent">NF</span>
+    <aside className="w-16 h-full border-r border-border flex flex-col justify-between py-5 flex-shrink-0 bg-bg relative z-50">
+      <div className="flex items-center justify-center">
+        <div className="w-9 h-9 rounded-full border-2 border-accent flex items-center justify-center">
+          <span className="font-display text-[9px] font-bold tracking-[0.2em] uppercase text-accent">NF</span>
+        </div>
       </div>
 
-      <nav className="flex flex-col -my-px">
+      <nav className="flex flex-col">
         {navItems.map((page) => (
           <div
             key={page.id}
-            className={`writing-vertical transform rotate-180 font-display text-[10px] font-normal tracking-[0.18em] uppercase cursor-pointer transition-all border-b border-[hsl(0,0%,17%)] last:border-b-0 rounded-none border-solid border mx-0 my-0 px-[25px] py-[28px] ${
+            className={`writing-vertical transform rotate-180 font-display text-[10px] font-normal tracking-[0.18em] uppercase cursor-pointer transition-all border-b border-border last:border-b-0 px-0 py-[28px] flex items-center justify-center ${
               currentPage === page.id
-                ? 'bg-accent text-[#2a2a2a] z-10'
-                : 'text-muted-foreground hover:bg-accent hover:text-[#2a2a2a] hover:z-10'
+                ? 'bg-accent text-[#2a2a2a]'
+                : 'text-muted-foreground hover:bg-accent hover:text-[#2a2a2a]'
             }`}
+            style={{ width: '100%' }}
             onClick={() => setCurrentPage(page.id)}
             role="button"
           >
