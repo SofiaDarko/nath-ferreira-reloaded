@@ -29,11 +29,11 @@ const PortfolioSidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage,
         </div>
       </div>
 
-      <nav className="flex flex-col">
+      <nav className="flex flex-col overflow-visible">
         {navItems.map((page) => (
           <div
             key={page.id}
-            className={`writing-vertical transform rotate-180 font-display text-[10px] font-normal tracking-[0.18em] uppercase cursor-pointer transition-all border-b border-border last:border-b-0 px-0 py-[28px] flex items-center justify-center ${
+            className={`writing-vertical transform rotate-180 font-display text-[11px] font-normal tracking-[0.18em] uppercase cursor-pointer transition-all border-b border-border last:border-b-0 px-0 py-[28px] flex items-center justify-center overflow-visible whitespace-nowrap ${
               currentPage === page.id
                 ? 'bg-accent text-[#2a2a2a]'
                 : 'text-muted-foreground hover:bg-accent hover:text-[#2a2a2a]'
