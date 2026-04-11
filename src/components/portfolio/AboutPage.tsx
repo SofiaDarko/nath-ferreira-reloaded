@@ -30,6 +30,11 @@ const AboutPage: React.FC<AboutPageProps> = ({ isEditing, editableTexts, onTextC
   const experiencesTitle = lang === 'en' ? globalSettings.experiencesTitleEn : globalSettings.experiencesTitle;
   const bioPlaceholder = lang === 'en' ? globalSettings.bioDefaultEn : globalSettings.bioDefault;
 
+  // Check if saved bio has real content (not just empty HTML tags/whitespace)
+  const savedBio = editableTexts[`about-bio-${lang}`];
+  const hasRealContent = savedBio && savedBio.replace(/<[^>]*>/g, '').trim().length > 0;
+  const bioValue = hasRealContent ? savedBio : bioPlaceholder;
+
   return (
     <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full relative overflow-hidden">
       <div
