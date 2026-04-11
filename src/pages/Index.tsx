@@ -12,10 +12,14 @@ import { TRANSLATIONS } from '../data/translations';
 import { DEFAULT_THEME, DEFAULT_GLOBAL_SETTINGS, DEFAULT_SKILLS, DEFAULT_EXPERIENCES, DEFAULT_PROJECTS, DEFAULT_SOCIAL_LINKS } from '../data/defaults';
 import type { Project, Skill, Experience, EditableTexts, Theme, GlobalSettings, PageId, Lang, SocialLink } from '../types/portfolio';
 
-function loadState<T>(key: string, fallback: T): T {
+function loadState<T>(key: string, fallback: T, merge = false): T {
   try {
     const saved = localStorage.getItem(key);
-    return saved ? JSON.parse(saved) : fallback;
+    if (!saved) return fallback;
+    const parsed = JSON.parse(saved);
+    return merge && typeof fallback === 'object' && !Array.isArray(fallback)
+      ? { ...fallback, ...parsed }
+      : parsed;
   } catch {
     return fallback;
   }
@@ -32,7 +36,7 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
   const [editableTexts, setEditableTexts] = useState<EditableTexts>(() => loadState('nf_texts', {}));
   const [userPhoto, setUserPhoto] = useState<string | null>(() => loadState('nf_photo', null));
   const [theme, setTheme] = useState<Theme>(() => loadState('nf_theme', DEFAULT_THEME));
-  const [globalSettings, setGlobalSettings] = useState<GlobalSettings>(() => loadState('nf_settings', DEFAULT_GLOBAL_SETTINGS));
+  const [globalSettings, setGlobalSettings] = useState<GlobalSettings>(() => loadState('nf_settings', DEFAULT_GLOBAL_SETTINGS, true));
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>(() => loadState('nf_social_links', DEFAULT_SOCIAL_LINKS));
 
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
