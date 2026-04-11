@@ -16,9 +16,9 @@ interface SidebarProps {
 
 const PortfolioSidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, onAdminClick, isLoggedIn, onLogout, t, showAdminButton = false, lang, globalSettings }) => {
   const navItems = [
-    { id: 'home' as PageId, label: lang === 'en' ? globalSettings.navHomeEn : globalSettings.navHome },
-    { id: 'about' as PageId, label: lang === 'en' ? globalSettings.navAboutEn : globalSettings.navAbout },
-    { id: 'contact' as PageId, label: lang === 'en' ? globalSettings.navContactEn : globalSettings.navContact },
+    { id: 'home' as PageId, label: (lang === 'en' ? globalSettings.navHomeEn : globalSettings.navHome) || t.home || 'Home' },
+    { id: 'about' as PageId, label: (lang === 'en' ? globalSettings.navAboutEn : globalSettings.navAbout) || t.about || 'Sobre' },
+    { id: 'contact' as PageId, label: (lang === 'en' ? globalSettings.navContactEn : globalSettings.navContact) || t.contact || 'Contato' },
   ];
 
   return (
