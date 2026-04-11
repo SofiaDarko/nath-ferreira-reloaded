@@ -466,6 +466,71 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
             </div>
           )}
 
+          {activeTab === 'contact' && (
+            <div className="max-w-2xl">
+              <h3 className="font-display text-[10px] tracking-[0.18em] uppercase text-muted-foreground mb-6">
+                {editingLinkId ? (lang === 'pt' ? 'Editando Link' : 'Editing Link') : (lang === 'pt' ? 'Adicionar Link' : 'Add Link')}
+              </h3>
+              <div className="flex flex-col gap-3 mb-8">
+                <div className="flex flex-col gap-1">
+                  <label className={labelClass}>{lang === 'pt' ? 'Nome / Rótulo' : 'Label'}</label>
+                  <input type="text" value={linkLabel} onChange={(e) => setLinkLabel(e.target.value)} placeholder="Ex: Email, LinkedIn, Behance" className={inputClass} />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className={labelClass}>URL</label>
+                  <input type="text" value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} placeholder="Ex: mailto:seu@email.com ou https://..." className={inputClass} />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className={labelClass}>{lang === 'pt' ? 'Texto exibido' : 'Display text'}</label>
+                  <input type="text" value={linkText} onChange={(e) => setLinkText(e.target.value)} placeholder="Ex: seu@email.com, @usuario" className={inputClass} />
+                </div>
+                <div className="flex gap-3 mt-1">
+                  <button className="bg-accent text-bg rounded-lg py-2.5 px-5 font-display text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:opacity-80 w-fit" onClick={() => {
+                    if (!linkLabel) return;
+                    if (editingLinkId) {
+                      setSocialLinks((prev) => prev.map((l) => l.id === editingLinkId ? { ...l, label: linkLabel, url: linkUrl, text: linkText } : l));
+                    } else {
+                      setSocialLinks((prev) => [...prev, { id: Date.now().toString(), label: linkLabel, url: linkUrl, text: linkText }]);
+                    }
+                    setEditingLinkId(null); setLinkLabel(''); setLinkUrl(''); setLinkText('');
+                  }}>
+                    <Plus size={12} className="inline mr-1" />
+                    {editingLinkId ? (lang === 'pt' ? 'Salvar' : 'Save') : (lang === 'pt' ? 'Adicionar' : 'Add')}
+                  </button>
+                  {editingLinkId && (
+                    <button className="border border-border text-muted-foreground rounded-lg py-2.5 px-5 font-display text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:opacity-80" onClick={() => {
+                      setEditingLinkId(null); setLinkLabel(''); setLinkUrl(''); setLinkText('');
+                    }}>
+                      {lang === 'pt' ? 'Cancelar' : 'Cancel'}
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <h3 className="font-display text-[10px] tracking-[0.18em] uppercase text-muted-foreground mb-5">{lang === 'pt' ? 'Links cadastrados' : 'Saved Links'}</h3>
+              <div className="flex flex-col gap-2.5">
+                {socialLinks.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">{lang === 'pt' ? 'Nenhum link cadastrado.' : 'No links yet.'}</p>
+                ) : (
+                  socialLinks.map((link) => (
+                    <div key={link.id} className="flex items-center justify-between p-3 border border-border rounded-xl hover:border-muted transition-colors">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-display text-[12px] tracking-tight">{link.label}</div>
+                        <div className="text-[10px] text-muted-foreground truncate">{link.text || link.url}</div>
+                      </div>
+                      <div className="flex items-center gap-1.5 flex-shrink-0 ml-3">
+                        <button className="w-7 h-7 border border-accent/40 rounded-md flex items-center justify-center text-accent hover:bg-accent/10 transition-colors" onClick={() => {
+                          setEditingLinkId(link.id); setLinkLabel(link.label); setLinkUrl(link.url); setLinkText(link.text || '');
+                        }} title={t.edit}><Pencil size={12} /></button>
+                        <button className="w-7 h-7 border border-accent2/40 rounded-md flex items-center justify-center text-accent2 hover:bg-accent2/10 transition-colors" onClick={() => setSocialLinks((prev) => prev.filter((l) => l.id !== link.id))}><Trash2 size={12} /></button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
           {activeTab === 'appearance' && (
             <div className="max-w-xl">
               <h3 className="font-display text-[10px] tracking-[0.18em] uppercase text-muted-foreground mb-6">{t.colors}</h3>
