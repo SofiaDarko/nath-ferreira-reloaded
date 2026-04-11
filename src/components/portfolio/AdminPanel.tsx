@@ -31,6 +31,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'projects' | 'about' | 'appearance' | 'globalTexts' | 'contact'>('projects');
 
+  // Social Link editing
+  const [editingLinkId, setEditingLinkId] = useState<string | null>(null);
+  const [linkLabel, setLinkLabel] = useState('');
+  const [linkUrl, setLinkUrl] = useState('');
+  const [linkText, setLinkText] = useState('');
+
   // Project Form
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [name, setName] = useState('');
