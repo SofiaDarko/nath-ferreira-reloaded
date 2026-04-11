@@ -185,6 +185,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const tabs = [
     { id: 'projects' as const, label: lang === 'pt' ? 'Projetos' : 'Projects' },
     { id: 'about' as const, label: lang === 'pt' ? 'Sobre' : 'About' },
+    { id: 'contact' as const, label: lang === 'pt' ? 'Contato' : 'Contact' },
     { id: 'appearance' as const, label: t.appearance },
     { id: 'globalTexts' as const, label: t.globalTexts },
   ];
