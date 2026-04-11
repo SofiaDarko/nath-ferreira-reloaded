@@ -30,6 +30,11 @@ const AboutPage: React.FC<AboutPageProps> = ({ isEditing, editableTexts, onTextC
   const experiencesTitle = lang === 'en' ? globalSettings.experiencesTitleEn : globalSettings.experiencesTitle;
   const bioPlaceholder = lang === 'en' ? globalSettings.bioDefaultEn : globalSettings.bioDefault;
 
+  // Check if saved bio has real content (not just empty HTML tags/whitespace)
+  const savedBio = editableTexts[`about-bio-${lang}`];
+  const hasRealContent = savedBio && savedBio.replace(/<[^>]*>/g, '').trim().length > 0;
+  const bioValue = hasRealContent ? savedBio : bioPlaceholder;
+
   return (
     <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full relative overflow-hidden">
       <div
@@ -54,7 +59,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ isEditing, editableTexts, onTextC
             </div>
             <div className="max-w-xl">
               <h2 className="font-display text-[clamp(28px,3.5vw,52px)] font-normal leading-[1.08] tracking-tight mb-6" dangerouslySetInnerHTML={{ __html: hello }} />
-              <EditableText id={`about-bio-${lang}`} isEditing={isEditing} value={editableTexts[`about-bio-${lang}`] || bioPlaceholder} onChange={onTextChange} className="text-sm leading-relaxed text-fg/60 max-w-[480px]" />
+              <EditableText id={`about-bio-${lang}`} isEditing={isEditing} value={bioValue} onChange={onTextChange} className="text-base leading-relaxed text-fg/70 max-w-[480px]" />
             </div>
           </div>
         </div>
