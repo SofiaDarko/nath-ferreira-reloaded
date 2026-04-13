@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, ArrowRight, ArrowLeft } from 'lucide-react';
+import { X, Images, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Project } from '../../types/portfolio';
 
 interface ProjectModalProps {
@@ -12,8 +12,8 @@ interface ProjectModalProps {
 const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose, lang }) => {
   const [imgIdx, setImgIdx] = useState(0);
 
-  const next = () => setImgIdx((i) => (i + 1) % project.images.length);
-  const prev = () => setImgIdx((i) => (i - 1 + project.images.length) % project.images.length);
+  const next = () => setImgIdx((i) => Math.min(i + 1, project.images.length - 1));
+  const prev = () => setImgIdx((i) => Math.max(i - 1, 0));
 
   const name = lang === 'en' && project.name_en ? project.name_en : project.name;
   const description = lang === 'en' && project.description_en ? project.description_en : project.description;
@@ -37,7 +37,32 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose, lang }) =
                 </span>
               ))}
             </div>
+            <div className="flex items-center gap-2 mt-5 text-fg/40 font-body text-xs">
+              <Images size={14} />
+              <span>
+                {project.images.length} {project.images.length === 1 ? (lang === 'pt' ? 'imagem' : 'image') : (lang === 'pt' ? 'imagens' : 'images')}
+              </span>
+            </div>
           </div>
+
+          {project.images.length > 1 && (
+            <div className="flex gap-3">
+              <button
+                className="w-12 h-12 rounded-full flex items-center justify-center bg-accent text-bg transition-opacity hover:opacity-85 disabled:opacity-30 disabled:pointer-events-none"
+                onClick={prev}
+                disabled={imgIdx === 0}
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <button
+                className="w-12 h-12 rounded-full flex items-center justify-center bg-accent text-bg transition-opacity hover:opacity-85 disabled:opacity-30 disabled:pointer-events-none"
+                onClick={next}
+                disabled={imgIdx === project.images.length - 1}
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          )}
         </motion.div>
 
         {/* Right image area */}
@@ -60,19 +85,9 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose, lang }) =
             </AnimatePresence>
           </div>
           {project.images.length > 1 && (
-            <>
-              <div className="absolute bottom-11 left-10 font-display text-[10px] tracking-widest text-muted-foreground">
-                {imgIdx + 1} / {project.images.length}
-              </div>
-              <div className="absolute bottom-9 right-10 flex gap-2.5 z-10">
-                <button className="w-10 h-10 border border-border rounded-full flex items-center justify-center cursor-pointer text-fg transition-colors hover:border-accent hover:text-accent bg-bg/70 backdrop-blur-md" onClick={prev}>
-                  <ArrowLeft size={16} />
-                </button>
-                <button className="w-10 h-10 border border-border rounded-full flex items-center justify-center cursor-pointer text-fg transition-colors hover:border-accent hover:text-accent bg-bg/70 backdrop-blur-md" onClick={next}>
-                  <ArrowRight size={16} />
-                </button>
-              </div>
-            </>
+            <div className="absolute bottom-11 left-10 font-display text-[10px] tracking-widest text-muted-foreground">
+              {imgIdx + 1} / {project.images.length}
+            </div>
           )}
         </div>
       </div>
