@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { X, Plus, Trash2, Pencil, ArrowUp, ArrowDown } from 'lucide-react';
 import { HexColorPicker } from 'react-colorful';
