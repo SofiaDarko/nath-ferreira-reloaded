@@ -95,6 +95,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (photoPreview) URL.revokeObjectURL(photoPreview);
+      setPhotoPreview(URL.createObjectURL(file));
       const reader = new FileReader();
       reader.onload = (ev) => { const r = ev.target?.result as string; if (r) setUserPhoto(r); };
       reader.readAsDataURL(file);
