@@ -35,7 +35,7 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
   const [skills, setSkills] = useState<Skill[]>(() => loadState('nf_skills', DEFAULT_SKILLS));
   const [experiences, setExperiences] = useState<Experience[]>(() => loadState('nf_experiences', DEFAULT_EXPERIENCES));
   const [editableTexts, setEditableTexts] = useState<EditableTexts>(() => loadState('nf_texts', {}));
-  const [userPhoto, setUserPhoto] = useState<string | null>(() => loadState('nf_photo', null));
+  const [userPhoto, setUserPhoto] = useState<string | null>(() => loadState('nf_photo_url', null));
   const [theme, setTheme] = useState<Theme>(() => loadState('nf_theme', DEFAULT_THEME));
   const [globalSettings, setGlobalSettings] = useState<GlobalSettings>(() => loadState('nf_settings', DEFAULT_GLOBAL_SETTINGS, true));
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>(() => loadState('nf_social_links', DEFAULT_SOCIAL_LINKS));
@@ -51,7 +51,7 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
   useEffect(() => { localStorage.setItem('nf_skills', JSON.stringify(skills)); }, [skills]);
   useEffect(() => { localStorage.setItem('nf_experiences', JSON.stringify(experiences)); }, [experiences]);
   useEffect(() => { localStorage.setItem('nf_texts', JSON.stringify(editableTexts)); }, [editableTexts]);
-  useEffect(() => { try { localStorage.setItem('nf_photo', JSON.stringify(userPhoto)); } catch (e) { console.warn('Photo too large for localStorage, skipping persist.'); } }, [userPhoto]);
+  useEffect(() => { if (userPhoto) { localStorage.setItem('nf_photo_url', JSON.stringify(userPhoto)); } }, [userPhoto]);
   useEffect(() => { localStorage.setItem('nf_theme', JSON.stringify(theme)); }, [theme]);
   useEffect(() => { localStorage.setItem('nf_settings', JSON.stringify(globalSettings)); }, [globalSettings]);
   useEffect(() => { localStorage.setItem('nf_social_links', JSON.stringify(socialLinks)); }, [socialLinks]);
