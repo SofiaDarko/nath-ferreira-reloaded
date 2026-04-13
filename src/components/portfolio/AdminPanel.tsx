@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { X, Plus, Trash2, Pencil, ArrowUp, ArrowDown } from 'lucide-react';
 import { HexColorPicker } from 'react-colorful';
@@ -64,6 +64,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const [expDescEn, setExpDescEn] = useState('');
 
   const [colorTarget, setColorTarget] = useState<keyof Theme | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => { if (photoPreview) URL.revokeObjectURL(photoPreview); };
+  }, [photoPreview]);
 
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
@@ -90,6 +95,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (photoPreview) URL.revokeObjectURL(photoPreview);
+      setPhotoPreview(URL.createObjectURL(file));
       const reader = new FileReader();
       reader.onload = (ev) => { const r = ev.target?.result as string; if (r) setUserPhoto(r); };
       reader.readAsDataURL(file);
@@ -392,6 +399,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                 <p className="text-[13px] text-muted-foreground">{lang === 'pt' ? 'Clique para enviar foto' : 'Click to upload photo'}</p>
                 <p className="text-[10px] text-muted-foreground/60 mt-2">{lang === 'pt' ? 'Tamanho ideal: 500 × 500 px' : 'Ideal size: 500 × 500 px'}</p>
               </div>
+              {photoPreview && (
+                <div className="mt-4 mb-6 flex justify-center">
+                  <img src={photoPreview} alt="Preview" className="w-32 h-32 object-cover rounded-xl border border-border" />
+                </div>
+              )}
 
               <h3 className="font-display text-[10px] tracking-[0.18em] uppercase text-muted-foreground mb-6">{t.addSkill}</h3>
               <div className="flex flex-col gap-3 mb-8">
