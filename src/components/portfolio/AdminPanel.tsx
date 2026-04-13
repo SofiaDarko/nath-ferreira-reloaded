@@ -388,12 +388,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                   ))
                 )}
               </div>
-              </div>
-              {photoPreview && (
-                <div className="mt-4 mb-6 flex justify-center">
-                  <img src={photoPreview} alt="Preview" className="w-32 h-32 object-cover rounded-xl border border-border" />
-                </div>
-              )}
+            </div>
           )}
 
           {activeTab === 'about' && (
