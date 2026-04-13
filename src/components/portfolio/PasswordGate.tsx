@@ -1,32 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PasswordGateProps {
   onSuccess: () => void;
   onClose: () => void;
 }
 
-// SHA-256 hash of the admin password (not the password itself)
-const ADMIN_HASH = '023c87f7c58822fe623be46438bf0abfd3973cdaf0bd0daafd5c59ad19a71d49';
-
-async function sha256(message: string): Promise<string> {
-  const msgBuffer = new TextEncoder().encode(message);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
 const PasswordGate: React.FC<PasswordGateProps> = ({ onSuccess, onClose }) => {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const hash = await sha256(password);
-    if (hash === ADMIN_HASH) {
-      onSuccess();
+    setLoading(true);
+    setError('');
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setLoading(false);
+    if (error) {
+      setError('Credenciais inválidas.');
     } else {
-      setError('Senha incorreta. Tente novamente.');
+      onSuccess();
     }
   };
 
@@ -43,15 +39,22 @@ const PasswordGate: React.FC<PasswordGateProps> = ({ onSuccess, onClose }) => {
       <form onSubmit={handleSubmit} className="text-center max-w-[320px] w-full px-5">
         <h3 className="font-display text-[11px] tracking-[0.2em] uppercase text-accent mb-7">— Acesso Restrito —</h3>
         <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Senha de administrador"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email"
           className="w-full bg-[#111] border border-border rounded-lg text-fg font-body text-sm p-3 outline-none focus:border-accent transition-colors mb-4 text-center"
           autoFocus
         />
-        <button type="submit" className="w-full bg-fg text-bg py-3.5 rounded-lg font-display text-[11px] uppercase tracking-widest hover:bg-accent transition-all">
-          Entrar
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Senha"
+          className="w-full bg-[#111] border border-border rounded-lg text-fg font-body text-sm p-3 outline-none focus:border-accent transition-colors mb-4 text-center"
+        />
+        <button type="submit" disabled={loading} className="w-full bg-fg text-bg py-3.5 rounded-lg font-display text-[11px] uppercase tracking-widest hover:bg-accent transition-all disabled:opacity-50">
+          {loading ? '...' : 'Entrar'}
         </button>
         <div className="mt-4 text-accent2 text-xs h-4 font-body">{error}</div>
         <button type="button" onClick={onClose} className="mt-4 text-[10px] text-muted-foreground hover:text-fg uppercase tracking-widest">
