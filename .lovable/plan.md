@@ -1,22 +1,28 @@
 
 
-## Corrigir parágrafo de bio invisível na página Sobre
+## Corrigir borda lateral do botão "Contato" na Sidebar
 
 ### Problema
-O texto de bio abaixo do título "Olá, sou Nath..." não aparece. Possíveis causas:
-1. O valor salvo em `editableTexts['about-bio-pt']` pode conter HTML vazio (ex: `<br>`, espaços) que é truthy mas visualmente vazio, impedindo o fallback para `bioPlaceholder`
-2. A cor `text-fg/60` (branco a 60% opacidade) em `text-sm` pode ter contraste insuficiente
+O screenshot confirma que "CONTATO" não mostra bordas laterais, apesar de todos os três itens compartilharem a mesma className com `border-x border-border`. Provável causa: a classe `last:border-b-0` pode estar resetando a propriedade `border` de forma que anula o `border-x` no último item, dependendo da ordem de geração das classes pelo Tailwind.
 
 ### Correção
 
-**Arquivo: `src/components/portfolio/AboutPage.tsx`**
-- Melhorar o fallback do bio: verificar se o texto salvo tem conteúdo real (não apenas tags HTML vazias ou whitespace) antes de usá-lo — caso contrário, usar `bioPlaceholder`
-- Aumentar a opacidade do texto de `text-fg/60` para `text-fg/70` para melhor visibilidade
-- Aumentar o tamanho de `text-sm` para `text-base` para o parágrafo ficar mais legível
+**Arquivo único: `src/components/portfolio/PortfolioSidebar.tsx`**
 
-**Arquivo: `src/components/portfolio/EditableText.tsx`**
-- Sem alterações estruturais
+Substituir `border-b border-x border-border last:border-b-0` por classes mais explícitas que não conflitem:
+
+```
+border-l border-r border-b border-border last:border-b-0
+```
+
+Ou, se persistir, usar abordagem de borda explícita por inline style no último item para garantir que as bordas laterais nunca sejam perdidas:
+
+```
+border-l border-r border-border border-b [&:last-child]:border-b-0
+```
+
+Nenhuma outra propriedade (layout, cores, espaçamento, hover) será alterada.
 
 ### Resultado
-O parágrafo de bio volta a ser visível abaixo do título, tanto com texto personalizado quanto com o placeholder padrão.
+Todos os três botões (Home, Sobre, Contato) terão bordas laterais idênticas de 1px.
 
