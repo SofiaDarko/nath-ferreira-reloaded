@@ -1,28 +1,25 @@
 
 
-## Corrigir borda lateral do botão "Contato" na Sidebar
+## Adicionar preview de foto no painel admin
 
-### Problema
-O screenshot confirma que "CONTATO" não mostra bordas laterais, apesar de todos os três itens compartilharem a mesma className com `border-x border-border`. Provável causa: a classe `last:border-b-0` pode estar resetando a propriedade `border` de forma que anula o `border-x` no último item, dependendo da ordem de geração das classes pelo Tailwind.
+### Arquivo único: `src/components/portfolio/AdminPanel.tsx`
 
-### Correção
+**Alterações:**
 
-**Arquivo único: `src/components/portfolio/PortfolioSidebar.tsx`**
+1. **Novo estado** — adicionar `const [photoPreview, setPhotoPreview] = useState<string | null>(null)` para armazenar a URL temporária do preview.
 
-Substituir `border-b border-x border-border last:border-b-0` por classes mais explícitas que não conflitem:
+2. **Modificar `handlePhotoUpload`** — antes da lógica existente de FileReader, gerar preview com `URL.createObjectURL(file)` e guardar no estado. Se já existir um preview anterior, revogar com `URL.revokeObjectURL()`.
 
-```
-border-l border-r border-b border-border last:border-b-0
-```
+3. **Cleanup** — adicionar `useEffect` que revoga a URL ao desmontar o componente.
 
-Ou, se persistir, usar abordagem de borda explícita por inline style no último item para garantir que as bordas laterais nunca sejam perdidas:
+4. **Renderizar preview** — logo abaixo do `div` de upload (linha ~394, antes do `<h3>` de skills), exibir condicionalmente:
+   ```
+   {photoPreview && (
+     <div className="mt-4 mb-6 flex justify-center">
+       <img src={photoPreview} alt="Preview" className="w-32 h-32 object-cover rounded-xl border border-border" />
+     </div>
+   )}
+   ```
 
-```
-border-l border-r border-border border-b [&:last-child]:border-b-0
-```
-
-Nenhuma outra propriedade (layout, cores, espaçamento, hover) será alterada.
-
-### Resultado
-Todos os três botões (Home, Sobre, Contato) terão bordas laterais idênticas de 1px.
+**O que NÃO muda:** lógica de salvamento via FileReader/setUserPhoto, nenhum outro arquivo.
 
