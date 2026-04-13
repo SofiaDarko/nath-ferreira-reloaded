@@ -5,6 +5,8 @@ import { X, Plus, Trash2, Pencil, ArrowUp, ArrowDown } from 'lucide-react';
 import { HexColorPicker } from 'react-colorful';
 import type { Project, Skill, Experience, EditableTexts, Theme, GlobalSettings, SocialLink } from '../../types/portfolio';
 import { TAG_OPTIONS } from '../../data/translations';
+import { DEFAULT_THEME } from '../../data/defaults';
+import { toast } from 'sonner';
 
 interface AdminPanelProps {
   projects: Project[];
@@ -585,6 +587,21 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                     )}
                   </div>
                 ))}
+              </div>
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => toast.success('Tema salvo!')}
+                  className="px-4 py-2 rounded-lg text-xs font-medium bg-accent text-black hover:opacity-90 transition"
+                  style={{ backgroundColor: 'var(--theme-accent)', color: '#000' }}
+                >
+                  Salvar tema
+                </button>
+                <button
+                  onClick={() => { setTheme(DEFAULT_THEME); toast.success('Tema resetado!'); }}
+                  className="px-4 py-2 rounded-lg text-xs font-medium border border-border text-muted-foreground hover:text-foreground transition"
+                >
+                  Resetar
+                </button>
               </div>
             </div>
           )}
