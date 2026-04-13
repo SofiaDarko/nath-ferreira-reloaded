@@ -50,7 +50,7 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
   useEffect(() => { localStorage.setItem('nf_skills', JSON.stringify(skills)); }, [skills]);
   useEffect(() => { localStorage.setItem('nf_experiences', JSON.stringify(experiences)); }, [experiences]);
   useEffect(() => { localStorage.setItem('nf_texts', JSON.stringify(editableTexts)); }, [editableTexts]);
-  useEffect(() => { localStorage.setItem('nf_photo', JSON.stringify(userPhoto)); }, [userPhoto]);
+  useEffect(() => { try { localStorage.setItem('nf_photo', JSON.stringify(userPhoto)); } catch (e) { console.warn('Photo too large for localStorage, skipping persist.'); } }, [userPhoto]);
   useEffect(() => { localStorage.setItem('nf_theme', JSON.stringify(theme)); }, [theme]);
   useEffect(() => { localStorage.setItem('nf_settings', JSON.stringify(globalSettings)); }, [globalSettings]);
   useEffect(() => { localStorage.setItem('nf_social_links', JSON.stringify(socialLinks)); }, [socialLinks]);
