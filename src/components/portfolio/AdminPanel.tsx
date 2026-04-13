@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { motion } from 'motion/react';
 import { X, Plus, Trash2, Pencil, ArrowUp, ArrowDown } from 'lucide-react';
 import { HexColorPicker } from 'react-colorful';
@@ -92,15 +93,29 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     });
   };
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      if (photoPreview) URL.revokeObjectURL(photoPreview);
-      setPhotoPreview(URL.createObjectURL(file));
-      const reader = new FileReader();
-      reader.onload = (ev) => { const r = ev.target?.result as string; if (r) setUserPhoto(r); };
-      reader.readAsDataURL(file);
+    if (!file) return;
+    if (photoPreview) URL.revokeObjectURL(photoPreview);
+    setPhotoPreview(URL.createObjectURL(file));
+
+    const ext = file.name.split('.').pop() || 'jpg';
+    const filePath = `profile-photo.${ext}`;
+
+    const { error } = await supabase.storage
+      .from('portfolio-assets')
+      .upload(filePath, file, { upsert: true });
+
+    if (error) {
+      console.error('Upload failed:', error.message);
+      return;
     }
+
+    const { data: urlData } = supabase.storage
+      .from('portfolio-assets')
+      .getPublicUrl(filePath);
+
+    setUserPhoto(urlData.publicUrl);
   };
 
   const handleSkillIconUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
