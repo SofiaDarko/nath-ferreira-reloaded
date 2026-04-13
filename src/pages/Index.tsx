@@ -103,7 +103,23 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
     setEditableTexts((prev) => ({ ...prev, [id]: html }));
   };
 
-  const handleLogout = () => {
+  // Sync isLoggedIn with real auth session
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session);
+      if (!session) {
+        setIsAdminOpen(false);
+        setIsEditing(false);
+      }
+    });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     setIsAdminOpen(false);
     setIsEditing(false);
     setIsLoggedIn(false);
