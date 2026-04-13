@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { AnimatePresence } from 'motion/react';
 import PortfolioSidebar from '../components/portfolio/PortfolioSidebar';
 import LanguageSwitcher from '../components/portfolio/LanguageSwitcher';
