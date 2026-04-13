@@ -1,21 +1,22 @@
 
 
-## Corrigir border ausente no botão "Contato"
+## Adicionar `border-t border-border` ao `<nav>` da sidebar
 
-### Diagnóstico
+### Arquivo único: `src/components/portfolio/PortfolioSidebar.tsx`
 
-Os itens de nav usam `writing-vertical transform rotate-180`, o que rotaciona 180° o elemento. Com essa rotação, as propriedades CSS de borda são mapeadas visualmente assim:
+### Alteração
 
-- `border-b` lógico → borda **superior** visual (entre itens, ok)
-- `border-l` / `border-r` → invertidos visualmente
+**Linha 33** — adicionar `border-t border-border` ao className do `<nav>`:
 
-A classe `last:border-b-0` remove o `border-bottom` lógico do último item ("Contato"). Porém, devido ao `rotate-180`, esse `border-bottom` corresponde visualmente a uma das bordas laterais — e é por isso que um lado do "Contato" perde a borda.
+De:
+```
+<nav className="flex flex-col overflow-visible">
+```
 
-### Correção — Arquivo único: `src/components/portfolio/PortfolioSidebar.tsx`
+Para:
+```
+<nav className="flex flex-col overflow-visible border-t border-border">
+```
 
-**Linha 36:** Remover `last:border-b-0` da string de classes dos itens de navegação.
-
-Isso restaura a borda lateral visual do "Contato" sem afetar os outros itens (que já têm todas as bordas). A separação visual entre itens continua funcionando porque cada item tem suas próprias bordas em todos os lados.
-
-Nenhum style inline. Nenhum outro arquivo alterado. Nenhuma mudança no `<aside>` pai.
+Nenhuma outra linha é alterada. Nenhum outro arquivo é tocado.
 
