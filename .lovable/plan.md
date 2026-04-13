@@ -1,10 +1,23 @@
 
 
-## Reimplantar Edge Function auth-email-hook
+## Traduzir EMAIL_SUBJECTS para português brasileiro
 
-**Objetivo:** Forçar o redeploy da função para que o preview reflita o `SITE_NAME` atual, sem alterar lógica ou visual.
+**Arquivo:** `supabase/functions/auth-email-hook/index.ts`
 
-**Ação:**
-1. Adicionar um comentário inócuo (ex: `// redeployed`) no final do arquivo `supabase/functions/auth-email-hook/index.ts`
-2. Reimplantar com `deploy_edge_functions`
+**Alteração:** Substituir os valores do objeto `EMAIL_SUBJECTS` (linhas 18-25):
+
+```typescript
+const EMAIL_SUBJECTS: Record<string, string> = {
+  signup: 'Confirme seu e-mail',
+  invite: 'Você foi convidado',
+  magiclink: 'Seu link de acesso',
+  recovery: 'Redefina sua senha',
+  email_change: 'Confirme seu novo e-mail',
+  reauthentication: 'Seu código de verificação',
+}
+```
+
+**Depois:** Reimplantar a Edge Function `auth-email-hook` com `deploy_edge_functions`.
+
+Nenhum outro arquivo será alterado.
 
