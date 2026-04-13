@@ -64,6 +64,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const [expDescEn, setExpDescEn] = useState('');
 
   const [colorTarget, setColorTarget] = useState<keyof Theme | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => { if (photoPreview) URL.revokeObjectURL(photoPreview); };
+  }, [photoPreview]);
 
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
