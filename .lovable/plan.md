@@ -1,48 +1,24 @@
 
 
-## Bento Grid Layout — `src/components/portfolio/HomePage.tsx`
+## Alterações no ProjectModal.tsx
 
-### Arquivo único alterado: `src/components/portfolio/HomePage.tsx`
+### Arquivo único: `src/components/portfolio/ProjectModal.tsx`
 
-### Alterações
+### Mudanças
 
-**1. Helper function** — adicionar antes do `ProjectCard`:
+**1. Imports** — trocar `ArrowLeft, ArrowRight` por `Images, ChevronLeft, ChevronRight`.
 
-```ts
-function getVariant(index: number): 'landscape' | 'square' | 'wide-short' {
-  const pos = index % 5;
-  if (pos === 0 || pos === 3) return 'landscape';
-  if (pos === 4) return 'wide-short';
-  return 'square';
-}
-```
+**2. Navegação não-circular** — simplificar `next`/`prev` com `Math.min`/`Math.max` (botões desabilitam nos extremos).
 
-**2. ProjectCard** — refatorar props e sizing:
+**3. Contador de imagens** — após as tags no painel esquerdo, adicionar bloco discreto com ícone `Images` + texto `"{n} imagem(ns)"` em `text-fg/40 text-xs`.
 
-- Remover props: `isHovered`, `onHover`, `onLeave`
-- Adicionar prop: `variant: 'landscape' | 'square' | 'wide-short'`
-- Remover `style` com `width`/`minWidth`/`flexShrink` dinâmicos
-- Aplicar classes baseadas no variant:
-  - `landscape`: `w-[420px] row-span-2` (ocupa 2 linhas)
-  - `square`: `w-[200px]` (1 linha)
-  - `wide-short`: `w-[420px]` (1 linha, mais largo e menos alto)
+**4. Botões de navegação no painel esquerdo** — na parte inferior do `motion.div` (segundo filho do `justify-between`), renderizar dois botões `w-12 h-12 rounded-full bg-accent text-bg` com `ChevronLeft`/`ChevronRight`. Desabilitados com `opacity-30 pointer-events-none` nos extremos. Ocultos completamente se só 1 imagem.
 
-**3. Container dos cards** (linha 141) — substituir:
-
-De: `flex gap-5 h-full w-max items-stretch`
-
-Para: `grid grid-rows-2 grid-flow-col gap-4 h-full w-max`
-
-**4. Estado removido** — deletar `hoveredIndex` (linha 69) e as props `isHovered`/`onHover`/`onLeave` passadas ao `ProjectCard` (linhas 163-165).
-
-**5. Placeholders vazios** — ajustar para usar grid similar (manter visual existente).
+**5. Remover setas do painel direito** — eliminar o bloco dos botões prev/next do painel direito. Manter apenas o counter `{imgIdx+1}/{total}` (só se >1 imagem).
 
 ### O que NÃO muda
-- Hover com blur/brightness/scale na imagem
-- Overlay de nome + tags
-- Border inset com `--theme-card-border`
-- `object-cover` nas imagens
-- Scroll horizontal com drag
-- Seta de auto-scroll
+- Layout, tamanho ou posição do painel direito
+- Imagem, animação, overlay
+- Botão de fechar (X)
 - Nenhum outro arquivo
 
