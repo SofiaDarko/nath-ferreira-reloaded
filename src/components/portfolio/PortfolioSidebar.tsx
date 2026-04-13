@@ -29,7 +29,7 @@ const PortfolioSidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage,
         </div>
       </div>
 
-      <nav className="flex flex-col overflow-visible">
+      <nav className="flex flex-col overflow-visible border-t border-border">
         {navItems.map((page) => (
           <div
             key={page.id}
