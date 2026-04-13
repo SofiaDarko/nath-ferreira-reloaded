@@ -1,24 +1,26 @@
 
 
-## Alterações no ProjectModal.tsx
+## Migração de Autenticação — SHA-256 → Lovable Cloud Auth
 
-### Arquivo único: `src/components/portfolio/ProjectModal.tsx`
+### Arquivos alterados (3)
 
-### Mudanças
+**1. `src/components/portfolio/PasswordGate.tsx`**
+- Remover `ADMIN_HASH`, função `sha256` e verificação client-side
+- Adicionar `import { supabase } from '@/integrations/supabase/client'`
+- Adicionar campo de email ao formulário (mesmo estilo visual do campo de senha)
+- Substituir `handleSubmit` por `supabase.auth.signInWithPassword({ email, password })`
+- Erro genérico: "Credenciais inválidas"
+- Manter visual, animação, ESC handler inalterados
 
-**1. Imports** — trocar `ArrowLeft, ArrowRight` por `Images, ChevronLeft, ChevronRight`.
+**2. `src/App.tsx`**
+- Renomear rota `/admin` para `/studio` (linha 19)
 
-**2. Navegação não-circular** — simplificar `next`/`prev` com `Math.min`/`Math.max` (botões desabilitam nos extremos).
-
-**3. Contador de imagens** — após as tags no painel esquerdo, adicionar bloco discreto com ícone `Images` + texto `"{n} imagem(ns)"` em `text-fg/40 text-xs`.
-
-**4. Botões de navegação no painel esquerdo** — na parte inferior do `motion.div` (segundo filho do `justify-between`), renderizar dois botões `w-12 h-12 rounded-full bg-accent text-bg` com `ChevronLeft`/`ChevronRight`. Desabilitados com `opacity-30 pointer-events-none` nos extremos. Ocultos completamente se só 1 imagem.
-
-**5. Remover setas do painel direito** — eliminar o bloco dos botões prev/next do painel direito. Manter apenas o counter `{imgIdx+1}/{total}` (só se >1 imagem).
+**3. `src/pages/Index.tsx`**
+- `handleLogout`: adicionar `await supabase.auth.signOut()`
+- Adicionar `useEffect` com `onAuthStateChange` para derivar `isLoggedIn` da sessão real e restaurar sessão ao recarregar
 
 ### O que NÃO muda
-- Layout, tamanho ou posição do painel direito
-- Imagem, animação, overlay
-- Botão de fechar (X)
+- Nenhum layout, componente visual ou lógica do admin panel
 - Nenhum outro arquivo
+- Nenhuma migração de banco
 
