@@ -75,22 +75,29 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     setSelectedTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
   };
 
-  const handleThumbUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleThumbUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => { const r = ev.target?.result as string; if (r) setThumb(r); };
-      reader.readAsDataURL(file);
-    }
+    if (!file) return;
+    const ext = file.name.split('.').pop() || 'jpg';
+    const filePath = `projects/${Date.now()}-thumb.${ext}`;
+    const { error } = await supabase.storage.from('portfolio-assets').upload(filePath, file);
+    if (error) { console.error('Thumb upload failed:', error.message); return; }
+    const { data: urlData } = supabase.storage.from('portfolio-assets').getPublicUrl(filePath);
+    setThumb(urlData.publicUrl);
   };
 
-  const handleImagesUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImagesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []).sort((a, b) => a.name.localeCompare(b.name));
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (ev) => { const r = ev.target?.result as string; if (r) setImages((prev) => [...prev, r]); };
-      reader.readAsDataURL(file);
-    });
+    const ts = Date.now();
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const ext = file.name.split('.').pop() || 'jpg';
+      const filePath = `projects/${ts}-${i}.${ext}`;
+      const { error } = await supabase.storage.from('portfolio-assets').upload(filePath, file);
+      if (error) { console.error('Image upload failed:', error.message); continue; }
+      const { data: urlData } = supabase.storage.from('portfolio-assets').getPublicUrl(filePath);
+      setImages((prev) => [...prev, urlData.publicUrl]);
+    }
   };
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,13 +125,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     setUserPhoto(urlData.publicUrl);
   };
 
-  const handleSkillIconUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSkillIconUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => { const r = ev.target?.result as string; if (r) setSkillIconUrl(r); };
-      reader.readAsDataURL(file);
-    }
+    if (!file) return;
+    const ext = file.name.split('.').pop() || 'jpg';
+    const filePath = `skills/${Date.now()}-icon.${ext}`;
+    const { error } = await supabase.storage.from('portfolio-assets').upload(filePath, file);
+    if (error) { console.error('Skill icon upload failed:', error.message); return; }
+    const { data: urlData } = supabase.storage.from('portfolio-assets').getPublicUrl(filePath);
+    setSkillIconUrl(urlData.publicUrl);
   };
 
   const clearProjectForm = () => {
@@ -345,7 +354,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                   </div>
                   {thumb && (
                     <div className="mt-2.5 relative w-16 h-16 rounded-lg overflow-hidden border border-border">
-                      <img src={thumb} className="w-full h-full object-cover" />
+                      <img src={thumb} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="%23888"/></svg>'; }} />
                       <div className="absolute top-1 right-1 w-4 h-4 bg-accent2/90 rounded-full flex items-center justify-center cursor-pointer text-fg text-[10px] font-bold" onClick={() => setThumb(null)}>✕</div>
                     </div>
                   )}
@@ -360,7 +369,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                   <div className="flex flex-wrap gap-2.5 mt-2.5">
                     {images.map((img, i) => (
                       <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border">
-                        <img src={img} className="w-full h-full object-cover" />
+                        <img src={img} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="%23888"/></svg>'; }} />
                         <div className="absolute top-1 right-1 w-4 h-4 bg-accent2/90 rounded-full flex items-center justify-center cursor-pointer text-fg text-[10px] font-bold" onClick={() => setImages((prev) => prev.filter((_, idx) => idx !== i))}>✕</div>
                       </div>
                     ))}
@@ -388,7 +397,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                 ) : (
                   projects.map((p, idx) => (
                     <div key={p.id} className="flex items-center gap-3.5 p-3.5 border border-border rounded-xl transition-colors hover:border-muted">
-                      <img src={p.thumb} className="w-12 h-12 rounded-lg object-cover bg-muted flex-shrink-0" />
+                      <img src={p.thumb} className="w-12 h-12 rounded-lg object-cover bg-muted flex-shrink-0" onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"><rect width="48" height="48" fill="%23888"/></svg>'; }} />
                       <div className="flex-1 min-w-0">
                         <h4 className="font-display text-[13px] font-normal mb-1 tracking-tight truncate">{p.name}</h4>
                         <p className="text-[11px] text-muted-foreground tracking-wide">{p.images.length} img · {p.tags.slice(0, 2).join(', ') || '—'}</p>
@@ -437,7 +446,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                   </div>
                   {skillIconUrl && (
                     <div className="mt-2 relative w-12 h-12 rounded-lg overflow-hidden border border-border">
-                      <img src={skillIconUrl} className="w-full h-full object-cover" />
+                      <img src={skillIconUrl} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"><rect width="48" height="48" fill="%23888"/></svg>'; }} />
                       <div className="absolute top-0.5 right-0.5 w-3.5 h-3.5 bg-accent2/90 rounded-full flex items-center justify-center cursor-pointer text-fg text-[9px] font-bold" onClick={() => setSkillIconUrl(null)}>✕</div>
                     </div>
                   )}
