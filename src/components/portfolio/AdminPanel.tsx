@@ -399,6 +399,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                 <p className="text-[13px] text-muted-foreground">{lang === 'pt' ? 'Clique para enviar foto' : 'Click to upload photo'}</p>
                 <p className="text-[10px] text-muted-foreground/60 mt-2">{lang === 'pt' ? 'Tamanho ideal: 500 × 500 px' : 'Ideal size: 500 × 500 px'}</p>
               </div>
+              {photoPreview && (
+                <div className="mt-4 mb-6 flex justify-center">
+                  <img src={photoPreview} alt="Preview" className="w-32 h-32 object-cover rounded-xl border border-border" />
+                </div>
+              )}
 
               <h3 className="font-display text-[10px] tracking-[0.18em] uppercase text-muted-foreground mb-6">{t.addSkill}</h3>
               <div className="flex flex-col gap-3 mb-8">
