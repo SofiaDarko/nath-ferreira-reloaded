@@ -1,27 +1,27 @@
 
 
-## Migrar uploads restantes para Cloud Storage
+## Adicionar botões "Salvar tema" e "Resetar" na seção Aparência
 
 ### Arquivo único: `src/components/portfolio/AdminPanel.tsx`
 
+### Confirmações solicitadas
+
+- **`DEFAULT_THEME`** em `src/data/defaults.ts` contém valores fixos hardcoded (bg: `#0a0a0a`, accent: `#c8f564`, etc.) — são os originais, nunca alterados pelo usuário.
+- **`setTheme(DEFAULT_THEME)`** atualiza o state, que por sua vez dispara o `useEffect` em `Index.tsx` que executa `localStorage.setItem('nf_theme', ...)` — ou seja, o reset persiste automaticamente no localStorage.
+- O color picker já atualiza em tempo real via `setTheme` → re-render do `<style>` com CSS variables no Index.tsx. Nada a mudar aqui.
+
 ### Alterações
 
-**1. `handleThumbUpload` (linhas 78-85)** — tornar `async`, substituir FileReader por upload ao bucket `portfolio-assets` com path `projects/{timestamp}-thumb.{ext}`, guardar URL pública no estado `thumb`.
+1. **Importar `DEFAULT_THEME`** — adicionar ao import existente de `../../data/defaults` (ou criar o import se não existir).
 
-**2. `handleImagesUpload` (linhas 87-94)** — tornar `async`, processar cada arquivo com upload sequencial ao bucket `portfolio-assets` com path `projects/{timestamp}-{index}.{ext}`, acumular URLs públicas no estado `images`.
+2. **Importar `toast`** de `sonner` para feedback visual.
 
-**3. `handleSkillIconUpload` (linhas 121-128)** — tornar `async`, upload ao bucket `portfolio-assets` com path `skills/{timestamp}-icon.{ext}`, guardar URL pública no estado `skillIconUrl`.
+3. **Adicionar dois botões após o grid de cores** (linha ~588, dentro do bloco `activeTab === 'appearance'`):
+   - **"Salvar tema"** — exibe `toast.success("Tema salvo!")` como confirmação visual (a persistência já é automática via useEffect).
+   - **"Resetar"** — executa `setTheme(DEFAULT_THEME)`, que automaticamente atualiza o site em tempo real E persiste no localStorage. Exibe `toast.success("Tema resetado!")`.
 
-**4. Fallback para base64 antigo** — nas `<img>` dentro do AdminPanel (linhas 348, 363, 391), adicionar `onError` handler que substitui o `src` por um placeholder cinza inline SVG. Isso cobre dados antigos salvos como base64 que eventualmente não renderizem.
+4. **Nenhum outro arquivo é alterado.**
 
-### O que NÃO muda
-- Nenhum outro arquivo é alterado
-- Lógica de `saveProject`, `saveSkill`, persistência em localStorage no Index.tsx — tudo permanece igual
-- Os componentes de exibição (HomePage, ProjectModal, AboutPage) já usam `<img src={valor}>` que funciona tanto com URLs públicas quanto com base64 antigo — não precisam de alteração
-- Upload de foto de perfil (já migrado anteriormente)
-
-### Detalhes técnicos
-- Cada upload usa nome único via `Date.now()` para evitar colisões
-- O bucket `portfolio-assets` e suas políticas RLS já existem
-- localStorage passa a guardar URLs (~100 bytes) em vez de base64 (~100KB+), eliminando risco de QuotaExceededError
+### Detalhe técnico
+O fluxo de persistência é: `setTheme()` → state update → useEffect em Index.tsx → `localStorage.setItem('nf_theme', JSON.stringify(theme))`. Tanto "Salvar" quanto "Resetar" passam por esse fluxo, garantindo que o localStorage reflete o estado atual.
 
