@@ -1,12 +1,11 @@
 
 
-## Alterar nome do remetente para "Nathalia Ferreira · Designer"
+## Atualizar o preview dos emails
 
-**Arquivo:** `supabase/functions/auth-email-hook/index.ts`
+O preview na aba Cloud → Emails é servido pela Edge Function `auth-email-hook` que está deployada. A constante `SITE_NAME` já foi alterada no código para `"Nathalia Ferreira Designer"`, mas o preview só atualiza quando a função é reimplantada.
 
-**Alteração:** Trocar a constante `SITE_NAME` de `"nath-ferreira-reloaded"` para `"Nathalia Ferreira · Designer"`.
+**Ação necessária:**
+- Reimplantar a Edge Function `auth-email-hook` com `deploy_edge_functions`
 
-Isso atualiza o campo "From" para: `Nathalia Ferreira · Designer <noreply@nathferreiradesigner.com>`
-
-Após a alteração, a Edge Function `auth-email-hook` será reimplantada.
+Isso fará o preview mostrar o nome atualizado em todos os templates.
 
