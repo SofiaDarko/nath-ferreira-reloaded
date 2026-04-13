@@ -10,9 +10,22 @@ interface HomePageProps {
   globalSettings: GlobalSettings;
 }
 
-function ProjectCard({ project, onClick, index, lang, isHovered, onHover, onLeave }: {
+function getVariant(index: number): 'landscape' | 'square' | 'wide-short' {
+  const pos = index % 5;
+  if (pos === 0 || pos === 3) return 'landscape';
+  if (pos === 4) return 'wide-short';
+  return 'square';
+}
+
+const variantClasses: Record<string, string> = {
+  landscape: 'w-[420px] row-span-2',
+  square: 'w-[200px]',
+  'wide-short': 'w-[420px]',
+};
+
+function ProjectCard({ project, onClick, index, lang, variant }: {
   project: Project; onClick: () => void; index: number; lang: string;
-  isHovered: boolean; onHover: () => void; onLeave: () => void;
+  variant: 'landscape' | 'square' | 'wide-short';
 }) {
   const name = lang === 'en' && project.name_en ? project.name_en : project.name;
   return (
@@ -20,16 +33,9 @@ function ProjectCard({ project, onClick, index, lang, isHovered, onHover, onLeav
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.6, delay: index * 0.1, ease: [0.25, 0.1, 0.25, 1] }}
-      className="group relative self-stretch cursor-pointer overflow-hidden rounded-2xl transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)]"
-      style={{
-        backgroundColor: 'var(--theme-card-bg, #161616)',
-        width: isHovered ? '420px' : '280px',
-        minWidth: isHovered ? '420px' : '280px',
-        flexShrink: 0,
-      }}
+      className={`group relative cursor-pointer overflow-hidden rounded-2xl ${variantClasses[variant]}`}
+      style={{ backgroundColor: 'var(--theme-card-bg, #161616)' }}
       onClick={onClick}
-      onMouseEnter={onHover}
-      onMouseLeave={onLeave}
       onContextMenu={(e) => e.preventDefault()}
     >
       <img
@@ -66,7 +72,6 @@ const HomePage: React.FC<HomePageProps> = ({ projects, onProjectClick, t, lang, 
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
   const [showRightArrow, setShowRightArrow] = useState(false);
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const scrollInterval = useRef<number | null>(null);
 
   const checkScroll = useCallback(() => {
@@ -138,7 +143,7 @@ const HomePage: React.FC<HomePageProps> = ({ projects, onProjectClick, t, lang, 
           onMouseUp={handleMouseUp}
           onMouseLeave={() => { handleMouseUp(); stopAutoScroll(); }}
         >
-          <div className="flex gap-5 h-full w-max items-stretch">
+          <div className="grid grid-rows-2 grid-flow-col gap-4 h-full w-max">
             {projects.length === 0
               ? Array.from({ length: 7 }).map((_, i) => (
                   <motion.div
@@ -146,8 +151,8 @@ const HomePage: React.FC<HomePageProps> = ({ projects, onProjectClick, t, lang, 
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.5, delay: i * 0.1, ease: [0.25, 0.1, 0.25, 1] }}
-                    className="relative rounded-2xl overflow-hidden min-h-[160px] min-w-[220px] max-w-[380px] flex items-center justify-center font-display text-[10px] text-[#252525] uppercase tracking-widest flex-col gap-2.5"
-                    style={{ flex: i % 3 === 0 ? '2.2' : '1', backgroundColor: 'var(--theme-card-bg, #161616)' }}
+                    className={`relative rounded-2xl overflow-hidden flex items-center justify-center font-display text-[10px] text-[#252525] uppercase tracking-widest flex-col gap-2.5 ${variantClasses[getVariant(i)]}`}
+                    style={{ backgroundColor: 'var(--theme-card-bg, #161616)' }}
                   >
                     <div className="text-2xl text-[#222]">◼</div>
                     <span>{lang === 'pt' ? 'Adicione projetos' : 'Add projects'}</span>
@@ -160,9 +165,7 @@ const HomePage: React.FC<HomePageProps> = ({ projects, onProjectClick, t, lang, 
                     onClick={() => onProjectClick(proj)}
                     index={i}
                     lang={lang}
-                    isHovered={hoveredIndex === i}
-                    onHover={() => setHoveredIndex(i)}
-                    onLeave={() => setHoveredIndex(null)}
+                    variant={getVariant(i)}
                   />
                 ))}
           </div>
