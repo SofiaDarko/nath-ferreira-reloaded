@@ -10,22 +10,22 @@ interface HomePageProps {
   globalSettings: GlobalSettings;
 }
 
-function getVariant(index: number): 'wide' | 'square' | 'horizontal' {
+function getVariant(index: number): 'landscape' | 'square' | 'wide-short' {
   const pos = index % 5;
-  if (pos === 0 || pos === 3) return 'wide';
-  if (pos === 4) return 'horizontal';
+  if (pos === 0 || pos === 3) return 'landscape';
+  if (pos === 4) return 'wide-short';
   return 'square';
 }
 
 const variantClasses: Record<string, string> = {
-  wide:       'w-[420px] aspect-[16/9]',
-  square:     'w-[240px] aspect-square',
-  horizontal: 'w-[360px] aspect-[4/3]',
+  landscape: 'w-[420px] row-span-2',
+  square: 'w-[200px]',
+  'wide-short': 'w-[420px]',
 };
 
 function ProjectCard({ project, onClick, index, lang, variant }: {
   project: Project; onClick: () => void; index: number; lang: string;
-  variant: 'wide' | 'square' | 'horizontal';
+  variant: 'landscape' | 'square' | 'wide-short';
 }) {
   const name = lang === 'en' && project.name_en ? project.name_en : project.name;
   return (
@@ -143,7 +143,7 @@ const HomePage: React.FC<HomePageProps> = ({ projects, onProjectClick, t, lang, 
           onMouseUp={handleMouseUp}
           onMouseLeave={() => { handleMouseUp(); stopAutoScroll(); }}
         >
-          <div className="grid grid-rows-2 grid-flow-col gap-4 w-max items-start">
+          <div className="grid grid-rows-2 grid-flow-col gap-4 h-full w-max">
             {projects.length === 0
               ? Array.from({ length: 7 }).map((_, i) => (
                   <motion.div
