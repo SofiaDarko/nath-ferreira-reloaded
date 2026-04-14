@@ -578,13 +578,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
               </div>
 
               <div className="flex flex-col gap-2.5 mt-6">
-                {experiences.map((exp) => (
+                {experiences.map((exp, i) => (
                   <div key={exp.id} className="flex items-center justify-between p-3 border border-border rounded-xl hover:border-muted transition-colors">
                     <div className="flex-1 min-w-0">
                       <div className="font-display text-[12px] tracking-tight">{exp.title}</div>
                       <div className="text-[10px] text-muted-foreground">{exp.company} · {exp.period}</div>
                     </div>
                     <div className="flex items-center gap-1.5 flex-shrink-0 ml-3">
+                      <button disabled={i === 0} className={`w-7 h-7 border border-accent/40 rounded-md flex items-center justify-center text-accent hover:bg-accent/10 transition-colors ${i === 0 ? 'opacity-30 pointer-events-none' : ''}`} onClick={() => setExperiences(prev => { const arr = [...prev]; [arr[i], arr[i - 1]] = [arr[i - 1], arr[i]]; return arr; })}><ArrowUp size={12} /></button>
+                      <button disabled={i === experiences.length - 1} className={`w-7 h-7 border border-accent/40 rounded-md flex items-center justify-center text-accent hover:bg-accent/10 transition-colors ${i === experiences.length - 1 ? 'opacity-30 pointer-events-none' : ''}`} onClick={() => setExperiences(prev => { const arr = [...prev]; [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]]; return arr; })}><ArrowDown size={12} /></button>
                       <button className="w-7 h-7 border border-accent/40 rounded-md flex items-center justify-center text-accent hover:bg-accent/10 transition-colors" onClick={() => editExperience(exp)} title={t.edit}><Pencil size={12} /></button>
                       <button className="w-7 h-7 border border-accent2/40 rounded-md flex items-center justify-center text-accent2 hover:bg-accent2/10 transition-colors" onClick={() => setExperiences((prev) => prev.filter((e) => e.id !== exp.id))}><Trash2 size={12} /></button>
                     </div>
@@ -640,13 +642,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                 {socialLinks.length === 0 ? (
                   <p className="text-xs text-muted-foreground">{lang === 'pt' ? 'Nenhum link cadastrado.' : 'No links yet.'}</p>
                 ) : (
-                  socialLinks.map((link) => (
+                  socialLinks.map((link, i) => (
                     <div key={link.id} className="flex items-center justify-between p-3 border border-border rounded-xl hover:border-muted transition-colors">
                       <div className="flex-1 min-w-0">
                         <div className="font-display text-[12px] tracking-tight">{link.label}</div>
                         <div className="text-[10px] text-muted-foreground truncate">{link.text || link.url}</div>
                       </div>
                       <div className="flex items-center gap-1.5 flex-shrink-0 ml-3">
+                        <button disabled={i === 0} className={`w-7 h-7 border border-accent/40 rounded-md flex items-center justify-center text-accent hover:bg-accent/10 transition-colors ${i === 0 ? 'opacity-30 pointer-events-none' : ''}`} onClick={() => setSocialLinks(prev => { const arr = [...prev]; [arr[i], arr[i - 1]] = [arr[i - 1], arr[i]]; return arr; })}><ArrowUp size={12} /></button>
+                        <button disabled={i === socialLinks.length - 1} className={`w-7 h-7 border border-accent/40 rounded-md flex items-center justify-center text-accent hover:bg-accent/10 transition-colors ${i === socialLinks.length - 1 ? 'opacity-30 pointer-events-none' : ''}`} onClick={() => setSocialLinks(prev => { const arr = [...prev]; [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]]; return arr; })}><ArrowDown size={12} /></button>
                         <button className="w-7 h-7 border border-accent/40 rounded-md flex items-center justify-center text-accent hover:bg-accent/10 transition-colors" onClick={() => {
                           setEditingLinkId(link.id); setLinkLabel(link.label); setLinkUrl(link.url); setLinkText(link.text || '');
                         }} title={t.edit}><Pencil size={12} /></button>
