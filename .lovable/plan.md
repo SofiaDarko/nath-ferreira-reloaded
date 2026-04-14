@@ -1,33 +1,45 @@
 
 
-## Adicionar verificação de sessão na função savePhoto
+## Reestruturar Bento Grid — HomePage.tsx
 
-**Arquivo:** `src/components/portfolio/AdminPanel.tsx`
+**Arquivo único:** `src/components/portfolio/HomePage.tsx`
 
-### Alteração (linhas 116-117)
+### Alteração 1 — Variantes (linhas 13-24)
 
-Inserir verificação de sessão após `if (!photoFile) return;` e antes do upload.
+Substituir `getVariant` e `variantClasses` por:
 
-Trecho atual:
 ```tsx
-const savePhoto = async () => {
-    if (!photoFile) return;
+function getVariant(index: number): 'wide' | 'square' | 'horizontal' {
+  const pos = index % 5;
+  if (pos === 0 || pos === 3) return 'wide';
+  if (pos === 4) return 'horizontal';
+  return 'square';
+}
+
+const variantClasses: Record<string, string> = {
+  wide:       'w-[420px] aspect-[16/9]',
+  square:     'w-[240px] aspect-square',
+  horizontal: 'w-[360px] aspect-[4/3]',
+};
 ```
 
-Trecho novo:
-```tsx
-const savePhoto = async () => {
-    if (!photoFile) return;
+Remove `row-span-2` e proporções verticais. Aspect-ratio CSS define altura intrínseca.
 
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      toast.error('Sessão expirada. Faça login novamente.');
-      return;
-    }
+### Alteração 2 — Container do grid (linha 146)
+
+De:
+```tsx
+<div className="grid grid-rows-2 grid-flow-col gap-4 h-full w-max">
+```
+Para:
+```tsx
+<div className="grid grid-rows-2 grid-flow-col gap-4 w-max items-start">
 ```
 
-### Notas
-- O cliente `supabase` importado (linha 3) é o mesmo usado para autenticação — não há instância separada
-- A verificação de sessão garante que o token JWT esteja presente no header do upload
-- Nenhum outro arquivo alterado
+### O que não muda
+- Props, `onProjectClick`, overlays, tags, borda decorativa
+- Proteção de imagem, drag-scroll, auto-scroll, seta
+- Placeholders vazios
+- `object-cover` na imagem
+- Nenhum outro arquivo
 
