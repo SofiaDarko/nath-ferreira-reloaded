@@ -123,6 +123,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       .upload(filePath, photoFile, { upsert: true });
 
     if (error) {
+      console.error('Supabase Storage error:', JSON.stringify(error));
       toast.error('Erro ao salvar foto.');
       return;
     }
