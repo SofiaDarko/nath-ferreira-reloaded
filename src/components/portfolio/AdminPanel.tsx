@@ -12,7 +12,8 @@ interface AdminPanelProps {
   projects: Project[];
   setProjects: React.Dispatch<React.SetStateAction<Project[]>>;
   onClose: () => void;
-  setUserPhoto: (s: string) => void;
+  setUserPhoto: (s: string | null) => void;
+  userPhoto: string | null;
   skills: Skill[];
   setSkills: React.Dispatch<React.SetStateAction<Skill[]>>;
   experiences: Experience[];
@@ -30,7 +31,7 @@ interface AdminPanelProps {
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = ({
-  projects, setProjects, onClose, setUserPhoto, skills, setSkills, experiences, setExperiences, socialLinks, setSocialLinks, t, lang, theme, setTheme, globalSettings, setGlobalSettings,
+  projects, setProjects, onClose, setUserPhoto, userPhoto, skills, setSkills, experiences, setExperiences, socialLinks, setSocialLinks, t, lang, theme, setTheme, globalSettings, setGlobalSettings,
 }) => {
   const [activeTab, setActiveTab] = useState<'projects' | 'about' | 'appearance' | 'globalTexts' | 'contact'>('projects');
 
@@ -68,6 +69,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
 
   const [colorTarget, setColorTarget] = useState<keyof Theme | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
 
   useEffect(() => {
     return () => { if (photoPreview) URL.revokeObjectURL(photoPreview); };
@@ -102,21 +104,25 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     }
   };
 
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (photoPreview) URL.revokeObjectURL(photoPreview);
     setPhotoPreview(URL.createObjectURL(file));
+    setPhotoFile(file);
+  };
 
-    const ext = file.name.split('.').pop() || 'jpg';
+  const savePhoto = async () => {
+    if (!photoFile) return;
+    const ext = photoFile.name.split('.').pop() || 'jpg';
     const filePath = `profile-photo.${ext}`;
 
     const { error } = await supabase.storage
       .from('portfolio-assets')
-      .upload(filePath, file, { upsert: true });
+      .upload(filePath, photoFile, { upsert: true });
 
     if (error) {
-      console.error('Upload failed:', error.message);
+      toast.error('Erro ao salvar foto.');
       return;
     }
 
@@ -124,7 +130,28 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       .from('portfolio-assets')
       .getPublicUrl(filePath);
 
-    setUserPhoto(urlData.publicUrl);
+    setUserPhoto(urlData.publicUrl + '?t=' + Date.now());
+    setPhotoFile(null);
+    if (photoPreview) URL.revokeObjectURL(photoPreview);
+    setPhotoPreview(null);
+    toast.success('Foto salva!');
+  };
+
+  const removePhoto = async () => {
+    const { error } = await supabase.storage
+      .from('portfolio-assets')
+      .remove(['profile-photo.jpg', 'profile-photo.png', 'profile-photo.jpeg', 'profile-photo.webp']);
+
+    if (error) {
+      toast.error('Erro ao remover foto.');
+      return;
+    }
+
+    setUserPhoto(null);
+    if (photoPreview) URL.revokeObjectURL(photoPreview);
+    setPhotoPreview(null);
+    setPhotoFile(null);
+    toast.success('Foto removida.');
   };
 
   const handleSkillIconUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -420,14 +447,26 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
           {activeTab === 'about' && (
             <div className="max-w-2xl">
               <h3 className="font-display text-[10px] tracking-[0.18em] uppercase text-muted-foreground mb-6">{lang === 'pt' ? 'Foto de Perfil' : 'Profile Photo'}</h3>
-              <div className="border border-dashed border-border rounded-xl p-7 text-center cursor-pointer hover:border-accent transition-all relative mb-10">
-                <input type="file" accept="image/*" onChange={handlePhotoUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
+              <div className="border border-dashed border-border rounded-xl p-7 text-center cursor-pointer hover:border-accent transition-all relative mb-4">
+                <input type="file" accept="image/*" onChange={handlePhotoSelect} className="absolute inset-0 opacity-0 cursor-pointer" />
                 <p className="text-[13px] text-muted-foreground">{lang === 'pt' ? 'Clique para enviar foto' : 'Click to upload photo'}</p>
                 <p className="text-[10px] text-muted-foreground/60 mt-2">{lang === 'pt' ? 'Tamanho ideal: 500 × 500 px' : 'Ideal size: 500 × 500 px'}</p>
               </div>
-              {photoPreview && (
-                <div className="mt-4 mb-6 flex justify-center">
-                  <img src={photoPreview} alt="Preview" className="w-32 h-32 object-cover rounded-xl border border-border" />
+              {(photoPreview || userPhoto) && (
+                <div className="mt-4 mb-6 flex flex-col items-center gap-3">
+                  <img src={photoPreview || userPhoto!} alt="Preview" className="w-32 h-32 object-cover rounded-xl border border-border" />
+                  <div className="flex gap-2">
+                    {photoFile && (
+                      <button onClick={savePhoto} className="px-4 py-2 rounded-lg bg-accent text-accent-foreground text-[12px] font-medium hover:opacity-90 transition-opacity">
+                        {lang === 'pt' ? 'Salvar foto' : 'Save photo'}
+                      </button>
+                    )}
+                    {userPhoto && (
+                      <button onClick={removePhoto} className="px-4 py-2 rounded-lg bg-destructive text-destructive-foreground text-[12px] font-medium hover:opacity-90 transition-opacity">
+                        {lang === 'pt' ? 'Remover foto' : 'Remove photo'}
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
 

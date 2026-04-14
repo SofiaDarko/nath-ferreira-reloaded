@@ -211,6 +211,7 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
             setProjects={setProjects}
             onClose={() => setIsAdminOpen(false)}
             setUserPhoto={setUserPhoto}
+            userPhoto={userPhoto}
             skills={skills}
             setSkills={setSkills}
             experiences={experiences}
