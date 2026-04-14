@@ -10,17 +10,17 @@ interface HomePageProps {
   globalSettings: GlobalSettings;
 }
 
-function getVariant(index: number): 'landscape' | 'square' | 'wide-short' {
+function getVariant(index: number): 'wide' | 'square' | 'horizontal' {
   const pos = index % 5;
-  if (pos === 0 || pos === 3) return 'landscape';
-  if (pos === 4) return 'wide-short';
+  if (pos === 0 || pos === 3) return 'wide';
+  if (pos === 4) return 'horizontal';
   return 'square';
 }
 
 const variantClasses: Record<string, string> = {
-  landscape: 'w-[420px] row-span-2',
-  square: 'w-[200px]',
-  'wide-short': 'w-[420px]',
+  wide:       'w-[420px] aspect-[16/9]',
+  square:     'w-[240px] aspect-square',
+  horizontal: 'w-[360px] aspect-[4/3]',
 };
 
 function ProjectCard({ project, onClick, index, lang, variant }: {
@@ -143,7 +143,7 @@ const HomePage: React.FC<HomePageProps> = ({ projects, onProjectClick, t, lang, 
           onMouseUp={handleMouseUp}
           onMouseLeave={() => { handleMouseUp(); stopAutoScroll(); }}
         >
-          <div className="grid grid-rows-2 grid-flow-col gap-4 h-full w-max">
+          <div className="grid grid-rows-2 grid-flow-col gap-4 w-max items-start">
             {projects.length === 0
               ? Array.from({ length: 7 }).map((_, i) => (
                   <motion.div
