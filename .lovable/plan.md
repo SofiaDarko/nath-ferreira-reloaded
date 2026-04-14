@@ -1,38 +1,40 @@
 
 
-## Adicionar botões "Salvar foto" e "Remover foto" na aba Sobre do AdminPanel
+## Adicionar reordenação em experiências e links de contato
 
-### Problema atual
-O `handlePhotoUpload` faz upload e chama `setUserPhoto` imediatamente ao selecionar o arquivo. O usuário não tem feedback visual (toast) nem botão de remover.
+**Arquivo:** `src/components/portfolio/AdminPanel.tsx`
 
-### Alterações em `src/components/portfolio/AdminPanel.tsx`
+### 1. Experiências (linhas 587-590)
 
-**1. Separar seleção de upload:**
-- `handlePhotoUpload` passa a apenas criar o preview local (`photoPreview`) e guardar o `File` em um novo estado `photoFile` — sem fazer upload.
-- Novo estado: `const [photoFile, setPhotoFile] = useState<File | null>(null);`
+Adicionar botões `ArrowUp` e `ArrowDown` no `div` de ações de cada experiência, antes do Pencil. Lógica de swap idêntica ao `moveSkill` já existente, mas operando sobre `setExperiences`.
 
-**2. Nova função `savePhoto`:**
-- Executa o upload ao Supabase Storage (mesma lógica atual: upsert em `portfolio-assets/profile-photo.{ext}`)
-- Em caso de sucesso: `setUserPhoto(url)`, `toast.success("Foto salva!")`, limpa `photoPreview` e `photoFile`
-- Em caso de erro: `toast.error("Erro ao salvar foto.")`
+Trecho atual (linha 587-590):
+```tsx
+<div className="flex items-center gap-1.5 flex-shrink-0 ml-3">
+  <button ...><Pencil /></button>
+  <button ...><Trash2 /></button>
+</div>
+```
 
-**3. Nova função `removePhoto`:**
-- Deleta o arquivo do Storage com `supabase.storage.from('portfolio-assets').remove(['profile-photo.*'])` (usando o path conhecido)
-- Chama `setUserPhoto(null)` — requer alterar o tipo do prop de `(s: string) => void` para `(s: string | null) => void`
-- `toast.success("Foto removida.")`
-- Limpa `photoPreview` e `photoFile`
+Trecho novo:
+```tsx
+<div className="flex items-center gap-1.5 flex-shrink-0 ml-3">
+  <button disabled={i===0} className={`w-7 h-7 ... ${i===0?'opacity-30 pointer-events-none':''}`} onClick={...swap i,i-1...}><ArrowUp size={12}/></button>
+  <button disabled={i===experiences.length-1} className={`... ${i===experiences.length-1?'opacity-30 pointer-events-none':''}`} onClick={...swap i,i+1...}><ArrowDown size={12}/></button>
+  <button ...><Pencil /></button>
+  <button ...><Trash2 /></button>
+</div>
+```
 
-**4. UI (linhas ~428-432):**
-- Após o `<img>` do preview, adicionar botão **"Salvar foto"** — visível apenas quando `photoPreview && photoFile` existem
-- Abaixo, botão **"Remover foto"** — visível apenas quando `userPhoto` não é null (prop passado ao componente, precisa ser adicionado às props)
-- Adicionar `userPhoto` como prop recebida no AdminPanel (atualmente não recebe, só recebe `setUserPhoto`)
+O `.map` na linha 581 precisa receber o índice: `experiences.map((exp, i) => ...)`.
 
-**5. Ajuste no Index.tsx:**
-- Passar `userPhoto` como prop ao `<AdminPanel>`
+### 2. Links de contato (linhas 649-654)
 
-### Arquivos alterados
-- `src/components/portfolio/AdminPanel.tsx` — lógica e UI dos botões
-- `src/pages/Index.tsx` — passar `userPhoto` como prop (1 linha)
+Mesma abordagem: adicionar `ArrowUp`/`ArrowDown` antes do Pencil no `.map` dos `socialLinks`.
 
-Nenhuma alteração visual ou lógica existente será modificada além do necessário.
+O `.map` na linha 643 precisa receber o índice: `socialLinks.map((link, i) => ...)`.
+
+### Nenhum outro arquivo alterado.
+
+Imports já incluem `ArrowUp` e `ArrowDown` (linha 4).
 
