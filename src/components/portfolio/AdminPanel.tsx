@@ -248,7 +248,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       return arr;
     });
   };
-  };
 
   const saveExperience = () => {
     if (!expTitle || !expPeriod) return;
