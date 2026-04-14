@@ -25,7 +25,7 @@ const variantClasses: Record<string, string> = {
 
 function ProjectCard({ project, onClick, index, lang, variant }: {
   project: Project; onClick: () => void; index: number; lang: string;
-  variant: 'landscape' | 'square' | 'wide-short';
+  variant: 'wide' | 'square' | 'horizontal';
 }) {
   const name = lang === 'en' && project.name_en ? project.name_en : project.name;
   return (
