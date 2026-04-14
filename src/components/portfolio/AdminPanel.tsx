@@ -115,6 +115,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
 
   const savePhoto = async () => {
     if (!photoFile) return;
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast.error('Sessão expirada. Faça login novamente.');
+      return;
+    }
     const ext = photoFile.name.split('.').pop() || 'jpg';
     const filePath = `profile-photo.${ext}`;
 
