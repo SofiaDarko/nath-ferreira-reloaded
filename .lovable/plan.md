@@ -1,27 +1,29 @@
 
 
-## Adicionar botão "Salvar textos" na aba Textos Globais
+## Adicionar log de erro na função savePhoto
 
 **Arquivo:** `src/components/portfolio/AdminPanel.tsx`
 
-### Alteração
+### Alteração (linhas 125-128)
 
-Após o `.map` dos campos (linha 725, antes do `</div>` de fechamento da seção na linha 726), adicionar um botão "Salvar textos" com estilo idêntico ao "Salvar" da aba Aparência (linha 686-691).
-
+Trecho atual:
 ```tsx
-<button
-  onClick={() => toast.success('Textos salvos!')}
-  className="px-4 py-2 rounded-lg text-xs font-medium bg-accent text-black hover:opacity-90 transition mt-2"
-  style={{ backgroundColor: 'var(--theme-accent)', color: '#000' }}
->
-  Salvar textos
-</button>
+if (error) {
+  toast.error('Erro ao salvar foto.');
+  return;
+}
 ```
 
-O `setGlobalSettings` já é chamado via `onChange` em cada campo, e o `useEffect` no `Index.tsx` persiste no `localStorage`. O botão serve apenas como confirmação visual com toast.
+Trecho novo:
+```tsx
+if (error) {
+  console.error('Supabase Storage error:', JSON.stringify(error));
+  toast.error('Erro ao salvar foto.');
+  return;
+}
+```
 
 ### Resumo
-- 1 bloco de ~7 linhas inserido na linha 725 do `AdminPanel.tsx`
+- 1 linha adicionada (console.error) na linha 126
 - Nenhum outro arquivo alterado
-- Import de `toast` já existe (linha 9)
 
