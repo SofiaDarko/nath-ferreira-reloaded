@@ -57,6 +57,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const [skillColor, setSkillColor] = useState('#ffffff');
   const [skillBg, setSkillBg] = useState('#141414');
   const [skillIconUrl, setSkillIconUrl] = useState<string | null>(null);
+  const [editingSkillId, setEditingSkillId] = useState<string | null>(null);
 
   // Experience Form
   const [editingExpId, setEditingExpId] = useState<string | null>(null);
@@ -207,17 +208,46 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
 
   const saveSkill = () => {
     if (!skillName) return;
-    const newSkill: Skill = { 
-      id: Date.now().toString(), 
-      name: skillName, 
-      icon: skillIcon || skillName.substring(0, 2), 
-      color: skillColor, 
-      bg: skillBg, 
-      special: false,
-      iconUrl: skillIconUrl || undefined
-    };
-    setSkills((prev) => [...prev, newSkill]);
+    if (editingSkillId) {
+      setSkills((prev) => prev.map((s) => s.id === editingSkillId ? {
+        ...s, name: skillName, icon: skillIcon || skillName.substring(0, 2),
+        color: skillColor, bg: skillBg, iconUrl: skillIconUrl || undefined
+      } : s));
+    } else {
+      const newSkill: Skill = { 
+        id: Date.now().toString(), 
+        name: skillName, 
+        icon: skillIcon || skillName.substring(0, 2), 
+        color: skillColor, 
+        bg: skillBg, 
+        special: false,
+        iconUrl: skillIconUrl || undefined
+      };
+      setSkills((prev) => [...prev, newSkill]);
+    }
+    clearSkillForm();
+  };
+
+  const clearSkillForm = () => {
+    setEditingSkillId(null);
     setSkillName(''); setSkillIcon(''); setSkillColor('#ffffff'); setSkillBg('#141414'); setSkillIconUrl(null);
+  };
+
+  const editSkill = (s: Skill) => {
+    setEditingSkillId(s.id);
+    setSkillName(s.name); setSkillIcon(s.icon); setSkillColor(s.color); setSkillBg(s.bg);
+    setSkillIconUrl(s.iconUrl || null);
+  };
+
+  const moveSkill = (index: number, direction: -1 | 1) => {
+    setSkills((prev) => {
+      const arr = [...prev];
+      const target = index + direction;
+      if (target < 0 || target >= arr.length) return prev;
+      [arr[index], arr[target]] = [arr[target], arr[index]];
+      return arr;
+    });
+  };
   };
 
   const saveExperience = () => {
@@ -502,15 +532,27 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                     </div>
                   )}
                 </div>
-                <button className="bg-accent text-bg rounded-lg py-2.5 px-5 font-display text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:opacity-80 w-fit" onClick={saveSkill}>
-                  <Plus size={12} className="inline mr-1" />{t.addSkill}
-                </button>
+                <div className="flex gap-2">
+                  <button className="bg-accent text-bg rounded-lg py-2.5 px-5 font-display text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:opacity-80 w-fit" onClick={saveSkill}>
+                    {editingSkillId
+                      ? (lang === 'pt' ? 'Salvar Alterações' : 'Save Changes')
+                      : (<><Plus size={12} className="inline mr-1" />{t.addSkill}</>)}
+                  </button>
+                  {editingSkillId && (
+                    <button className="border border-border text-muted-foreground rounded-lg py-2.5 px-5 font-display text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:opacity-80 w-fit" onClick={clearSkillForm}>
+                      {lang === 'pt' ? 'Cancelar' : 'Cancel'}
+                    </button>
+                  )}
+                </div>
               </div>
 
-              <div className="flex flex-wrap gap-2 mb-10">
-                {skills.map((s) => (
-                  <div key={s.id} className="flex items-center gap-2 px-3 py-1.5 border border-border rounded-full text-[11px] text-muted-foreground">
-                    {s.name}
+              <div className="flex flex-col gap-2 mb-10">
+                {skills.map((s, i) => (
+                  <div key={s.id} className="flex items-center gap-2 px-3 py-1.5 border border-border rounded-lg text-[11px] text-muted-foreground">
+                    <span className="flex-1">{s.name}</span>
+                    <button className="text-muted-foreground hover:text-accent" onClick={() => editSkill(s)}><Pencil size={10} /></button>
+                    <button className={`text-muted-foreground hover:text-accent ${i === 0 ? 'opacity-30 pointer-events-none' : ''}`} onClick={() => moveSkill(i, -1)}><ArrowUp size={10} /></button>
+                    <button className={`text-muted-foreground hover:text-accent ${i === skills.length - 1 ? 'opacity-30 pointer-events-none' : ''}`} onClick={() => moveSkill(i, 1)}><ArrowDown size={10} /></button>
                     <button className="text-accent2 hover:text-accent2" onClick={() => setSkills((prev) => prev.filter((sk) => sk.id !== s.id))}><Trash2 size={10} /></button>
                   </div>
                 ))}
