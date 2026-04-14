@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { motion } from 'motion/react';
-import { X, Plus, Trash2, Pencil, ArrowUp, ArrowDown } from 'lucide-react';
+import { X, Plus, Trash2, Pencil, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
 import { HexColorPicker } from 'react-colorful';
 import type { Project, Skill, Experience, EditableTexts, Theme, GlobalSettings, SocialLink } from '../../types/portfolio';
 import { TAG_OPTIONS } from '../../data/translations';
@@ -397,9 +397,19 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                   </div>
                   <div className="flex flex-wrap gap-2.5 mt-2.5">
                     {images.map((img, i) => (
-                      <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border">
+                      <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border group">
                         <img src={img} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="%23888"/></svg>'; }} />
                         <div className="absolute top-1 right-1 w-4 h-4 bg-accent2/90 rounded-full flex items-center justify-center cursor-pointer text-fg text-[10px] font-bold" onClick={() => setImages((prev) => prev.filter((_, idx) => idx !== i))}>✕</div>
+                        <div className="absolute bottom-0 left-0 right-0 flex justify-between bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => setImages((prev) => { const a = [...prev]; [a[i - 1], a[i]] = [a[i], a[i - 1]]; return a; })}
+                            className={`p-0.5 text-white ${i === 0 ? 'opacity-30 pointer-events-none' : 'cursor-pointer hover:text-accent'}`}
+                          ><ArrowLeft size={12} /></button>
+                          <button
+                            onClick={() => setImages((prev) => { const a = [...prev]; [a[i], a[i + 1]] = [a[i + 1], a[i]]; return a; })}
+                            className={`p-0.5 text-white ${i === images.length - 1 ? 'opacity-30 pointer-events-none' : 'cursor-pointer hover:text-accent'}`}
+                          ><ArrowRight size={12} /></button>
+                        </div>
                       </div>
                     ))}
                   </div>
