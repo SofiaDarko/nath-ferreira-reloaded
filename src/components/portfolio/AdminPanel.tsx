@@ -723,6 +723,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                   <span className={hintClass}>~{item.chars} caracteres</span>
                 </div>
               ))}
+              <button
+                onClick={() => toast.success('Textos salvos!')}
+                className="px-4 py-2 rounded-lg text-xs font-medium hover:opacity-90 transition mt-2"
+                style={{ backgroundColor: 'var(--theme-accent)', color: '#000' }}
+              >
+                Salvar textos
+              </button>
             </div>
           )}
         </div>
