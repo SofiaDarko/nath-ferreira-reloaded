@@ -10,18 +10,34 @@ interface HomePageProps {
   globalSettings: GlobalSettings;
 }
 
-function getVariant(index: number): 'landscape' | 'square' | 'portrait' {
-  const pos = index % 6;
-  if (pos === 0 || pos === 3 || pos === 5) return 'landscape';
-  if (pos === 2) return 'portrait';
+function getModuleVariant(posInModule: number): 'square' | 'horizontal' | 'portrait' {
+  if (posInModule === 2) return 'portrait';
+  if (posInModule === 1 || posInModule === 4) return 'horizontal';
   return 'square';
 }
 
 const variantClasses: Record<string, string> = {
-  landscape: 'w-[480px] aspect-[16/9]',
-  square: 'w-[280px] aspect-square',
-  portrait: 'w-[280px] aspect-[4/5] row-span-2',
+  square: 'aspect-square',
+  horizontal: 'aspect-[4/3]',
+  portrait: 'aspect-[4/5] row-span-2 h-full',
 };
+
+// Explicit grid placement for each position in the 5-card module
+const gridPlacements: Record<number, React.CSSProperties> = {
+  0: { gridColumn: 1, gridRow: 1 },
+  1: { gridColumn: 2, gridRow: 1 },
+  2: { gridColumn: 3, gridRow: '1 / 3' },
+  3: { gridColumn: 1, gridRow: 2 },
+  4: { gridColumn: 2, gridRow: 2 },
+};
+
+function chunkProjects<T>(arr: T[], size: number): T[][] {
+  const result: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) {
+    result.push(arr.slice(i, i + size));
+  }
+  return result;
+}
 
 function ProjectCard({ project, onClick, index, lang, variant }: {
   project: Project; onClick: () => void; index: number; lang: string;
