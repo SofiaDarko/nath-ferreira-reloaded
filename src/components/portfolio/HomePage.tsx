@@ -39,9 +39,10 @@ function chunkProjects<T>(arr: T[], size: number): T[][] {
   return result;
 }
 
-function ProjectCard({ project, onClick, index, lang, variant }: {
+function ProjectCard({ project, onClick, index, lang, variant, style }: {
   project: Project; onClick: () => void; index: number; lang: string;
-  variant: 'landscape' | 'square' | 'portrait';
+  variant: 'square' | 'horizontal' | 'portrait';
+  style?: React.CSSProperties;
 }) {
   const name = lang === 'en' && project.name_en ? project.name_en : project.name;
   return (
