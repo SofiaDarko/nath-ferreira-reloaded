@@ -415,7 +415,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                   <div className="border border-dashed border-border rounded-xl p-7 text-center cursor-pointer hover:border-accent transition-all relative">
                     <input type="file" accept="image/*" onChange={handleThumbUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
                     <p className="text-[13px] text-muted-foreground leading-relaxed">{lang === 'pt' ? 'Clique ou arraste' : 'Click or drag'}<br /><span className="text-accent font-medium">{lang === 'pt' ? 'imagem de capa' : 'cover image'}</span></p>
-                    <p className="text-[10px] text-muted-foreground/60 mt-2">{lang === 'pt' ? 'Tamanho ideal: 600 × 800 px' : 'Ideal size: 600 × 800 px'}</p>
+                    <p className="text-[10px] text-muted-foreground/60 mt-2">{lang === 'pt' ? 'Tamanho ideal: 1200×675 (16:9), 800×800 (1:1) ou 800×1000 (4:5)' : 'Ideal size: 1200×675 (16:9), 800×800 (1:1) or 800×1000 (4:5)'}</p>
                   </div>
                   {thumb && (
                     <div className="mt-2.5 relative w-16 h-16 rounded-lg overflow-hidden border border-border">
