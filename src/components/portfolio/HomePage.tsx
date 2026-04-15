@@ -160,30 +160,49 @@ const HomePage: React.FC<HomePageProps> = ({ projects, onProjectClick, t, lang, 
           onMouseUp={handleMouseUp}
           onMouseLeave={() => { handleMouseUp(); stopAutoScroll(); }}
         >
-          <div className="grid grid-rows-2 grid-flow-col gap-4 h-full w-max items-start">
+          <div className="flex gap-4 h-full w-max items-start">
             {projects.length === 0
-              ? Array.from({ length: 7 }).map((_, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5, delay: i * 0.1, ease: [0.25, 0.1, 0.25, 1] }}
-                    className={`relative rounded-2xl overflow-hidden flex items-center justify-center font-display text-[10px] text-[#252525] uppercase tracking-widest flex-col gap-2.5 ${variantClasses[getVariant(i)]}`}
-                    style={{ backgroundColor: 'var(--theme-card-bg, #161616)' }}
-                  >
-                    <div className="text-2xl text-[#222]">◼</div>
-                    <span>{lang === 'pt' ? 'Adicione projetos' : 'Add projects'}</span>
-                  </motion.div>
-                ))
-              : projects.map((proj, i) => (
-                  <ProjectCard
-                    key={proj.id}
-                    project={proj}
-                    onClick={() => onProjectClick(proj)}
-                    index={i}
-                    lang={lang}
-                    variant={getVariant(i)}
-                  />
+              ? (() => {
+                  const placeholders = Array.from({ length: 5 });
+                  return (
+                    <div className="grid grid-cols-[240px_320px_280px] grid-rows-2 gap-4 h-full">
+                      {placeholders.map((_, i) => {
+                        const variant = getModuleVariant(i);
+                        return (
+                          <motion.div
+                            key={i}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.5, delay: i * 0.1, ease: [0.25, 0.1, 0.25, 1] }}
+                            className={`relative rounded-2xl overflow-hidden flex items-center justify-center font-display text-[10px] text-[#252525] uppercase tracking-widest flex-col gap-2.5 ${variantClasses[variant]}`}
+                            style={{ backgroundColor: 'var(--theme-card-bg, #161616)', ...gridPlacements[i] }}
+                          >
+                            <div className="text-2xl text-[#222]">◼</div>
+                            <span>{lang === 'pt' ? 'Adicione projetos' : 'Add projects'}</span>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()
+              : chunkProjects(projects, 5).map((chunk, mi) => (
+                  <div key={mi} className="grid grid-cols-[240px_320px_280px] grid-rows-2 gap-4 h-full">
+                    {chunk.map((proj, posInModule) => {
+                      const globalIndex = mi * 5 + posInModule;
+                      const variant = getModuleVariant(posInModule);
+                      return (
+                        <ProjectCard
+                          key={proj.id}
+                          project={proj}
+                          onClick={() => onProjectClick(proj)}
+                          index={globalIndex}
+                          lang={lang}
+                          variant={variant}
+                          style={gridPlacements[posInModule]}
+                        />
+                      );
+                    })}
+                  </div>
                 ))}
           </div>
         </div>
