@@ -17,8 +17,8 @@ function getModuleVariant(posInModule: number): 'square' | 'horizontal' | 'portr
 }
 
 const variantClasses: Record<string, string> = {
-  square: 'aspect-square',
-  horizontal: 'aspect-[4/3]',
+  square: 'h-full',
+  horizontal: 'h-full',
   portrait: 'row-span-2 h-full',
 };
 
@@ -50,7 +50,7 @@ function ProjectCard({ project, onClick, index, lang, variant, style }: {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.6, delay: index * 0.1, ease: [0.25, 0.1, 0.25, 1] }}
-      className={`group relative cursor-pointer overflow-hidden rounded-2xl ${variantClasses[variant]}`}
+      className={`group relative cursor-pointer overflow-hidden rounded-2xl min-h-0 ${variantClasses[variant]}`}
       style={{ backgroundColor: 'var(--theme-card-bg, #161616)', ...style }}
       onClick={onClick}
       onContextMenu={(e) => e.preventDefault()}
