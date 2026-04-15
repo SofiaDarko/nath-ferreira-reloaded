@@ -19,7 +19,7 @@ function getModuleVariant(posInModule: number): 'square' | 'horizontal' | 'portr
 const variantClasses: Record<string, string> = {
   square: 'aspect-square',
   horizontal: 'aspect-[4/3]',
-  portrait: 'aspect-[4/5] row-span-2 h-full',
+  portrait: 'row-span-2 h-full',
 };
 
 // Explicit grid placement for each position in the 5-card module
