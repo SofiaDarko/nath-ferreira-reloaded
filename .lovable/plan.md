@@ -1,57 +1,99 @@
 
 
-## Reestruturar Bento Grid — HomePage.tsx + legenda AdminPanel.tsx
+## Reestruturar Bento Grid — módulo de 5 cards
 
-### Alteração 1 — Variantes e classes (HomePage.tsx, linhas 13-24)
+**Arquivo único:** `src/components/portfolio/HomePage.tsx`
+
+### Abordagem
+
+O layout atual usa `grid-rows-2 grid-flow-col` com itens individuais posicionados automaticamente pelo grid. O problema é que `grid-flow-col` com itens de larguras variadas e `row-span-2` cria lacunas quando o grid tenta preencher colunas automaticamente.
+
+A solução é **abandonar o grid auto-flow** e renderizar módulos explícitos de 5 cards, cada módulo sendo um sub-grid de 3 colunas × 2 linhas, dispostos horizontalmente via `flex`.
+
+### Estrutura do módulo
+
+```text
+Col 1      Col 2      Col 3
+┌──────┐  ┌────────┐  ┌──────┐
+│ 1:1  │  │  4:3   │  │      │
+│      │  │        │  │ 4:5  │
+├──────┤  ├────────┤  │      │
+│ 1:1  │  │  4:3   │  │      │
+│      │  │        │  │      │
+└──────┘  └────────┘  └──────┘
+Card 0     Card 1     Card 2 (row-span-2)
+Card 3     Card 4
+```
+
+### Alterações
+
+**1. Substituir `getVariant` e `variantClasses` (linhas 13-24)**
 
 ```tsx
-function getVariant(index: number): 'landscape' | 'square' | 'portrait' {
-  const pos = index % 6;
-  if (pos === 0 || pos === 3 || pos === 5) return 'landscape';
-  if (pos === 2) return 'portrait';
+// Dentro de um módulo de 5: posições 0,3 = square (col1), 1,4 = horizontal (col2), 2 = portrait (col3)
+function getModuleVariant(posInModule: number): 'square' | 'horizontal' | 'portrait' {
+  if (posInModule === 2) return 'portrait';
+  if (posInModule === 1 || posInModule === 4) return 'horizontal';
   return 'square';
 }
-
-const variantClasses: Record<string, string> = {
-  landscape: 'w-[480px] aspect-[16/9]',
-  square: 'w-[280px] aspect-square',
-  portrait: 'w-[280px] aspect-[4/5] row-span-2',
-};
 ```
 
-### Alteração 2 — Container do grid (HomePage.tsx, linha 146)
+**2. Substituir o grid por flex + sub-grids (linha 146-170)**
 
-Manter `h-full` (não remover). Apenas adicionar `items-start`:
+Em vez de um único `<div className="grid ...">`, renderizar assim:
 
-De:
 ```tsx
-<div className="grid grid-rows-2 grid-flow-col gap-4 h-full w-max">
+<div className="flex gap-4 h-full w-max items-start">
+  {modules.map((moduleProjects, mi) => (
+    <div key={mi} className="grid grid-cols-3 grid-rows-2 gap-4 h-full">
+      {moduleProjects.map((proj, posInModule) => {
+        const variant = getModuleVariant(posInModule);
+        // Card 2 (portrait) vai na col 3, row-span-2
+        // Cards 0,3 vão na col 1; cards 1,4 na col 2
+        const gridPlacement = getGridPlacement(posInModule);
+        return <ProjectCard ... style={gridPlacement} />;
+      })}
+    </div>
+  ))}
+</div>
 ```
-Para:
+
+Onde `modules` agrupa os projetos em chunks de 5:
 ```tsx
-<div className="grid grid-rows-2 grid-flow-col gap-4 h-full w-max items-start">
+const modules: Project[][] = [];
+for (let i = 0; i < projects.length; i += 5) {
+  modules.push(projects.slice(i, i + 5));
+}
 ```
 
-### Alteração 3 — Legenda de tamanho (AdminPanel.tsx, linha 418)
+**3. Posicionamento explícito via grid-area**
 
-De:
-```tsx
-<p ...>{lang === 'pt' ? 'Tamanho ideal: 600 × 800 px' : 'Ideal size: 600 × 800 px'}</p>
-```
-Para:
-```tsx
-<p ...>{lang === 'pt' ? 'Tamanho ideal: 1200×675 (16:9), 800×800 (1:1) ou 800×1000 (4:5)' : 'Ideal size: 1200×675 (16:9), 800×800 (1:1) or 800×1000 (4:5)'}</p>
-```
+Cada card recebe posição explícita para evitar lacunas:
 
-### Nota sobre row-span-2 + aspect-[4/5]
+| Pos | Grid position | Variant |
+|-----|--------------|---------|
+| 0 | col 1, row 1 | square (1:1) |
+| 1 | col 2, row 1 | horizontal (4:3) |
+| 2 | col 3, row 1-2 | portrait (4:5, row-span-2) |
+| 3 | col 1, row 2 | square (1:1) |
+| 4 | col 2, row 2 | horizontal (4:3) |
 
-Com `h-full` mantido no container e `grid-rows-2` definindo duas rows de altura igual (cada ~50% do container), `row-span-2` faz o card portrait ocupar 100% da altura disponível. O `aspect-[4/5]` define a largura intrínseca a partir dessa altura — os dois não conflitam porque `aspect-ratio` ajusta a dimensão livre (largura) quando a altura é definida pelo grid.
+Classes por variant (sem largura fixa — o grid define):
+- `square`: `aspect-square`
+- `horizontal`: `aspect-[4/3]`
+- `portrait`: `aspect-[4/5] row-span-2`
 
-Se após teste visual o card portrait ficar desproporcional (largura muito grande ou pequena), a correção será remover `row-span-2` do portrait e deixá-lo como card simples de 1 row. Mas o comportamento esperado é correto: altura = 100% do container, largura = altura × 4/5.
+Largura das colunas via `grid-template-columns` no sub-grid: algo como `grid-cols-[240px_320px_280px]` para que col1=square, col2=4:3, col3=4:5.
+
+A altura do portrait será `h-full` (100% das 2 rows + gap), garantindo sem espaços.
+
+**4. Placeholders vazios — mesma lógica**
+
+Quando `projects.length === 0`, gerar 1 módulo de 5 placeholders com a mesma estrutura.
 
 ### O que não muda
-- Props, `onProjectClick`, overlays, tags, borda, proteção de imagem
-- Drag-scroll, auto-scroll, seta
-- `object-cover` na imagem
-- Nenhum outro arquivo além dos dois listados
+- `ProjectCard` interno (hover, blur, overlay, tags, borda, proteção de imagem)
+- Drag-scroll, auto-scroll, seta direita, hint
+- Props do componente
+- Nenhum outro arquivo
 
