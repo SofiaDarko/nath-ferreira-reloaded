@@ -19,7 +19,7 @@ function getModuleVariant(posInModule: number): 'square' | 'horizontal' | 'portr
 const variantClasses: Record<string, string> = {
   square: 'aspect-square',
   horizontal: 'aspect-[4/3]',
-  portrait: 'aspect-[4/5] row-span-2 h-full',
+  portrait: 'row-span-2 h-full',
 };
 
 // Explicit grid placement for each position in the 5-card module
@@ -165,7 +165,7 @@ const HomePage: React.FC<HomePageProps> = ({ projects, onProjectClick, t, lang, 
               ? (() => {
                   const placeholders = Array.from({ length: 5 });
                   return (
-                    <div className="grid grid-cols-[240px_320px_280px] grid-rows-2 gap-4 h-full">
+                    <div className="grid grid-cols-[240px_320px_280px] grid-rows-[1fr_1fr] gap-4 h-full">
                       {placeholders.map((_, i) => {
                         const variant = getModuleVariant(i);
                         return (
@@ -186,7 +186,7 @@ const HomePage: React.FC<HomePageProps> = ({ projects, onProjectClick, t, lang, 
                   );
                 })()
               : chunkProjects(projects, 5).map((chunk, mi) => (
-                  <div key={mi} className="grid grid-cols-[240px_320px_280px] grid-rows-2 gap-4 h-full">
+                  <div key={mi} className="grid grid-cols-[240px_320px_280px] grid-rows-[1fr_1fr] gap-4 h-full">
                     {chunk.map((proj, posInModule) => {
                       const globalIndex = mi * 5 + posInModule;
                       const variant = getModuleVariant(posInModule);
