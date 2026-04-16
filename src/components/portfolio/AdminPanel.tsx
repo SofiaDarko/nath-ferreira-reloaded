@@ -34,7 +34,7 @@ interface AdminPanelProps {
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = ({
-  projects, setProjects, onClose, setUserPhoto, userPhoto, skills, setSkills, experiences, setExperiences, socialLinks, setSocialLinks, t, lang, theme, setTheme, globalSettings, setGlobalSettings,
+  projects, setProjects, deleteProject, onClose, setUserPhoto, userPhoto, skills, setSkills, deleteSkill, experiences, setExperiences, deleteExperience, socialLinks, setSocialLinks, t, lang, theme, setTheme, globalSettings, setGlobalSettings,
 }) => {
   const [activeTab, setActiveTab] = useState<'projects' | 'about' | 'appearance' | 'globalTexts' | 'contact'>('projects');
 
