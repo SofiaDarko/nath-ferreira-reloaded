@@ -198,7 +198,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       } : p));
     } else {
       const newProject: Project = {
-        id: Date.now().toString(), name, name_en: nameEn || undefined, description: desc, description_en: descEn || undefined,
+        id: crypto.randomUUID(), name, name_en: nameEn || undefined, description: desc, description_en: descEn || undefined,
         tags: selectedTags, thumb: thumb || images[0] || '', images: images.length > 0 ? images : (thumb ? [thumb] : []),
       };
       setProjects((prev) => [newProject, ...prev]);
