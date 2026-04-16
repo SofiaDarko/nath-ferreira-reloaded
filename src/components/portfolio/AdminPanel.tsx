@@ -484,7 +484,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                         <button className="w-7 h-7 border border-border rounded-md flex items-center justify-center text-muted-foreground hover:text-fg hover:border-fg transition-colors" onClick={() => moveProject(idx, -1)} title="▲"><ArrowUp size={12} /></button>
                         <button className="w-7 h-7 border border-border rounded-md flex items-center justify-center text-muted-foreground hover:text-fg hover:border-fg transition-colors" onClick={() => moveProject(idx, 1)} title="▼"><ArrowDown size={12} /></button>
                         <button className="w-7 h-7 border border-accent/40 rounded-md flex items-center justify-center text-accent hover:bg-accent/10 transition-colors" onClick={() => editProject(p)} title={t.edit}><Pencil size={12} /></button>
-                        <button className="w-7 h-7 border border-accent2/40 rounded-md flex items-center justify-center text-accent2 hover:bg-accent2/10 transition-colors" onClick={() => setProjects((prev) => prev.filter((proj) => proj.id !== p.id))}><Trash2 size={12} /></button>
+                        <button className="w-7 h-7 border border-accent2/40 rounded-md flex items-center justify-center text-accent2 hover:bg-accent2/10 transition-colors" onClick={() => deleteProject(p.id)}><Trash2 size={12} /></button>
                       </div>
                     </div>
                   ))
@@ -562,7 +562,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                     <button className="text-muted-foreground hover:text-accent" onClick={() => editSkill(s)}><Pencil size={10} /></button>
                     <button className={`text-muted-foreground hover:text-accent ${i === 0 ? 'opacity-30 pointer-events-none' : ''}`} onClick={() => moveSkill(i, -1)}><ArrowUp size={10} /></button>
                     <button className={`text-muted-foreground hover:text-accent ${i === skills.length - 1 ? 'opacity-30 pointer-events-none' : ''}`} onClick={() => moveSkill(i, 1)}><ArrowDown size={10} /></button>
-                    <button className="text-accent2 hover:text-accent2" onClick={() => setSkills((prev) => prev.filter((sk) => sk.id !== s.id))}><Trash2 size={10} /></button>
+                    <button className="text-accent2 hover:text-accent2" onClick={() => deleteSkill(s.id)}><Trash2 size={10} /></button>
                   </div>
                 ))}
               </div>
@@ -598,7 +598,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                       <button disabled={i === 0} className={`w-7 h-7 border border-accent/40 rounded-md flex items-center justify-center text-accent hover:bg-accent/10 transition-colors ${i === 0 ? 'opacity-30 pointer-events-none' : ''}`} onClick={() => setExperiences(prev => { const arr = [...prev]; [arr[i], arr[i - 1]] = [arr[i - 1], arr[i]]; return arr; })}><ArrowUp size={12} /></button>
                       <button disabled={i === experiences.length - 1} className={`w-7 h-7 border border-accent/40 rounded-md flex items-center justify-center text-accent hover:bg-accent/10 transition-colors ${i === experiences.length - 1 ? 'opacity-30 pointer-events-none' : ''}`} onClick={() => setExperiences(prev => { const arr = [...prev]; [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]]; return arr; })}><ArrowDown size={12} /></button>
                       <button className="w-7 h-7 border border-accent/40 rounded-md flex items-center justify-center text-accent hover:bg-accent/10 transition-colors" onClick={() => editExperience(exp)} title={t.edit}><Pencil size={12} /></button>
-                      <button className="w-7 h-7 border border-accent2/40 rounded-md flex items-center justify-center text-accent2 hover:bg-accent2/10 transition-colors" onClick={() => setExperiences((prev) => prev.filter((e) => e.id !== exp.id))}><Trash2 size={12} /></button>
+                      <button className="w-7 h-7 border border-accent2/40 rounded-md flex items-center justify-center text-accent2 hover:bg-accent2/10 transition-colors" onClick={() => deleteExperience(exp.id)}><Trash2 size={12} /></button>
                     </div>
                   </div>
                 ))}
