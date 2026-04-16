@@ -11,13 +11,16 @@ import { toast } from 'sonner';
 interface AdminPanelProps {
   projects: Project[];
   setProjects: React.Dispatch<React.SetStateAction<Project[]>>;
+  deleteProject: (id: string) => Promise<void>;
   onClose: () => void;
   setUserPhoto: (s: string | null) => void;
   userPhoto: string | null;
   skills: Skill[];
   setSkills: React.Dispatch<React.SetStateAction<Skill[]>>;
+  deleteSkill: (id: string) => Promise<void>;
   experiences: Experience[];
   setExperiences: React.Dispatch<React.SetStateAction<Experience[]>>;
+  deleteExperience: (id: string) => Promise<void>;
   socialLinks: SocialLink[];
   setSocialLinks: React.Dispatch<React.SetStateAction<SocialLink[]>>;
   editableTexts: EditableTexts;
