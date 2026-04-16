@@ -1,31 +1,57 @@
 
 
-## Ajustar larguras das colunas do Bento Grid — HomePage.tsx
+## Migração Total: localStorage → Banco de Dados
 
-**Arquivo único:** `src/components/portfolio/HomePage.tsx`
+### 1. Migração SQL (automática via integração)
 
-### Problema
+Criar 4 tabelas com RLS:
 
-As larguras atuais (`240px`, `320px`, `280px`) não refletem corretamente as proporções 1:1, 4:3 e 4:5 mostradas na imagem de referência. A coluna 4:3 deveria ser visivelmente mais larga que a 1:1, e a coluna 4:5 deveria ter largura proporcional à sua altura total.
+- **projects** — id (uuid), name, name_en, description, description_en, tags (text[]), thumb, images (text[]), sort_order, created_at
+- **skills** — id (uuid), name, icon, color, bg, special (bool), icon_url, sort_order
+- **experiences** — id (uuid), period, title, title_en, company, description, description_en, sort_order
+- **site_settings** — id (int, CHECK id=1), theme (jsonb), global_settings (jsonb), social_links (jsonb), editable_texts (jsonb), user_photo (text), updated_at
 
-### Solução
+RLS: public SELECT em todas; authenticated ALL em todas.
 
-Aumentar as larguras das 3 colunas mantendo a relação proporcional correta:
+### 2. Novo arquivo: `src/hooks/usePortfolioData.ts`
 
-- **Col 1 (1:1):** 280px — base quadrada
-- **Col 2 (4:3):** 373px — = 280 × 4/3, proporção 4:3 exata
-- **Col 3 (4:5):** 300px — largura para o portrait que ocupa 2 rows
+Hook que:
+- Busca dados das 4 tabelas ao montar
+- Se tabelas vazias, insere defaults de `defaults.ts` (seed automático)
+- Retorna state + setters que gravam no banco via upsert/insert/update/delete
+- Expõe `loading` boolean
 
-### Alteração
+### 3. Refatorar `src/pages/Index.tsx`
 
-Duas ocorrências de `grid-cols-[240px_320px_280px]` (linhas 168 e 189) mudam para:
+- Remover `loadState` e todos `useEffect` de `localStorage.setItem`
+- Usar `usePortfolioData` para obter dados + setters
+- Adicionar loading state mínimo
+- Manter toda a estrutura visual intacta
 
-```tsx
-grid-cols-[280px_373px_300px]
-```
+### 4. Refatorar `src/components/portfolio/AdminPanel.tsx`
 
-### O que não muda
-- Altura dos cards, `grid-rows-[1fr_1fr]`, gap, `h-full`
-- Hover, overlay, tags, borda, drag-scroll
-- Nenhum outro arquivo
+- `saveProject`, `saveSkill`, `saveExperience` → chamam `supabase.from(...).upsert/insert`
+- Delete → `supabase.from(...).delete()`
+- Reordenação → atualiza `sort_order`
+- Theme/globalSettings/socialLinks → upsert em `site_settings`
+- Remover referências a localStorage
+
+### Mapeamento DB ↔ TypeScript
+| TS field | DB column |
+|---|---|
+| `Project.description` | `projects.description` |
+| `Skill.iconUrl` | `skills.icon_url` |
+| `Experience.desc` | `experiences.description` |
+| `Experience.desc_en` | `experiences.description_en` |
+
+### Arquivos alterados
+1. Migração SQL (4 tabelas) — via ferramenta de migração
+2. `src/hooks/usePortfolioData.ts` — novo
+3. `src/pages/Index.tsx` — refatorar dados
+4. `src/components/portfolio/AdminPanel.tsx` — CRUD via banco
+
+### Arquivos NÃO alterados
+- Layout/estilo (HomePage, AboutPage, ContactPage, ProjectModal, etc.)
+- `src/types/portfolio.ts`
+- `src/data/defaults.ts`
 
