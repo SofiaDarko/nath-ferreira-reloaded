@@ -101,6 +101,141 @@ export type Database = {
         }
         Relationships: []
       }
+      experiences: {
+        Row: {
+          company: string
+          description: string
+          description_en: string | null
+          id: string
+          period: string
+          sort_order: number
+          title: string
+          title_en: string | null
+        }
+        Insert: {
+          company?: string
+          description?: string
+          description_en?: string | null
+          id?: string
+          period: string
+          sort_order?: number
+          title: string
+          title_en?: string | null
+        }
+        Update: {
+          company?: string
+          description?: string
+          description_en?: string | null
+          id?: string
+          period?: string
+          sort_order?: number
+          title?: string
+          title_en?: string | null
+        }
+        Relationships: []
+      }
+      projects: {
+        Row: {
+          created_at: string
+          description: string
+          description_en: string | null
+          id: string
+          images: string[]
+          name: string
+          name_en: string | null
+          sort_order: number
+          tags: string[]
+          thumb: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          description_en?: string | null
+          id?: string
+          images?: string[]
+          name: string
+          name_en?: string | null
+          sort_order?: number
+          tags?: string[]
+          thumb?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          description_en?: string | null
+          id?: string
+          images?: string[]
+          name?: string
+          name_en?: string | null
+          sort_order?: number
+          tags?: string[]
+          thumb?: string
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          editable_texts: Json
+          global_settings: Json
+          id: number
+          social_links: Json
+          theme: Json
+          updated_at: string
+          user_photo: string | null
+        }
+        Insert: {
+          editable_texts?: Json
+          global_settings?: Json
+          id?: number
+          social_links?: Json
+          theme?: Json
+          updated_at?: string
+          user_photo?: string | null
+        }
+        Update: {
+          editable_texts?: Json
+          global_settings?: Json
+          id?: number
+          social_links?: Json
+          theme?: Json
+          updated_at?: string
+          user_photo?: string | null
+        }
+        Relationships: []
+      }
+      skills: {
+        Row: {
+          bg: string
+          color: string
+          icon: string
+          icon_url: string | null
+          id: string
+          name: string
+          sort_order: number
+          special: boolean
+        }
+        Insert: {
+          bg?: string
+          color?: string
+          icon?: string
+          icon_url?: string | null
+          id?: string
+          name: string
+          sort_order?: number
+          special?: boolean
+        }
+        Update: {
+          bg?: string
+          color?: string
+          icon?: string
+          icon_url?: string | null
+          id?: string
+          name?: string
+          sort_order?: number
+          special?: boolean
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string

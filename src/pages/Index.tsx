@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { AnimatePresence } from 'motion/react';
 import PortfolioSidebar from '../components/portfolio/PortfolioSidebar';
@@ -10,51 +10,31 @@ import ProjectModal from '../components/portfolio/ProjectModal';
 import PasswordGate from '../components/portfolio/PasswordGate';
 import AdminPanel from '../components/portfolio/AdminPanel';
 import { TRANSLATIONS } from '../data/translations';
-import { DEFAULT_THEME, DEFAULT_GLOBAL_SETTINGS, DEFAULT_SKILLS, DEFAULT_EXPERIENCES, DEFAULT_PROJECTS, DEFAULT_SOCIAL_LINKS } from '../data/defaults';
-import type { Project, Skill, Experience, EditableTexts, Theme, GlobalSettings, PageId, Lang, SocialLink } from '../types/portfolio';
-
-function loadState<T>(key: string, fallback: T, merge = false): T {
-  try {
-    const saved = localStorage.getItem(key);
-    if (!saved) return fallback;
-    const parsed = JSON.parse(saved);
-    return merge && typeof fallback === 'object' && !Array.isArray(fallback)
-      ? { ...fallback, ...parsed }
-      : parsed;
-  } catch {
-    return fallback;
-  }
-}
+import { usePortfolioData } from '../hooks/usePortfolioData';
+import type { Project, PageId, Lang } from '../types/portfolio';
 
 const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
   const [lang, setLang] = useState<Lang>('pt');
   const [currentPage, setCurrentPage] = useState<PageId>('home');
   const t = TRANSLATIONS[lang];
 
-  const [projects, setProjects] = useState<Project[]>(() => loadState('nf_projects', DEFAULT_PROJECTS));
-  const [skills, setSkills] = useState<Skill[]>(() => loadState('nf_skills', DEFAULT_SKILLS));
-  const [experiences, setExperiences] = useState<Experience[]>(() => loadState('nf_experiences', DEFAULT_EXPERIENCES));
-  const [editableTexts, setEditableTexts] = useState<EditableTexts>(() => loadState('nf_texts', {}));
-  const [userPhoto, setUserPhoto] = useState<string | null>(() => loadState('nf_photo_url', null));
-  const [theme, setTheme] = useState<Theme>(() => loadState('nf_theme', DEFAULT_THEME));
-  const [globalSettings, setGlobalSettings] = useState<GlobalSettings>(() => loadState('nf_settings', DEFAULT_GLOBAL_SETTINGS, true));
-  const [socialLinks, setSocialLinks] = useState<SocialLink[]>(() => loadState('nf_social_links', DEFAULT_SOCIAL_LINKS));
+  const {
+    loading,
+    projects, setProjects, deleteProject,
+    skills, setSkills, deleteSkill,
+    experiences, setExperiences, deleteExperience,
+    editableTexts, setEditableTexts,
+    userPhoto, setUserPhoto,
+    theme, setTheme,
+    globalSettings, setGlobalSettings,
+    socialLinks, setSocialLinks,
+  } = usePortfolioData();
 
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isPasswordGateOpen, setIsPasswordGateOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  // Persist to localStorage
-  useEffect(() => { localStorage.setItem('nf_projects', JSON.stringify(projects)); }, [projects]);
-  useEffect(() => { localStorage.setItem('nf_skills', JSON.stringify(skills)); }, [skills]);
-  useEffect(() => { localStorage.setItem('nf_experiences', JSON.stringify(experiences)); }, [experiences]);
-  useEffect(() => { localStorage.setItem('nf_texts', JSON.stringify(editableTexts)); }, [editableTexts]);
-  useEffect(() => { if (userPhoto) { localStorage.setItem('nf_photo_url', JSON.stringify(userPhoto)); } }, [userPhoto]);
-  useEffect(() => { localStorage.setItem('nf_theme', JSON.stringify(theme)); }, [theme]);
-  useEffect(() => { localStorage.setItem('nf_settings', JSON.stringify(globalSettings)); }, [globalSettings]);
-  useEffect(() => { localStorage.setItem('nf_social_links', JSON.stringify(socialLinks)); }, [socialLinks]);
 
   // SEO — dynamic head updates per language
   useEffect(() => {
@@ -124,6 +104,14 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
     setIsEditing(false);
     setIsLoggedIn(false);
   };
+
+  if (loading) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center" style={{ backgroundColor: theme.bg }}>
+        <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: theme.accent, borderTopColor: 'transparent' }} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen w-screen overflow-hidden font-body" style={{ backgroundColor: theme.bg, color: theme.fg }}>
@@ -209,13 +197,16 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
           <AdminPanel
             projects={projects}
             setProjects={setProjects}
+            deleteProject={deleteProject}
             onClose={() => setIsAdminOpen(false)}
             setUserPhoto={setUserPhoto}
             userPhoto={userPhoto}
             skills={skills}
             setSkills={setSkills}
+            deleteSkill={deleteSkill}
             experiences={experiences}
             setExperiences={setExperiences}
+            deleteExperience={deleteExperience}
             socialLinks={socialLinks}
             setSocialLinks={setSocialLinks}
             editableTexts={editableTexts}
