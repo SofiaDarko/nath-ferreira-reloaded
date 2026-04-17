@@ -1,4 +1,4 @@
-import type { Project, Skill, Experience, GlobalSettings, Theme, SocialLink } from '../types/portfolio';
+import type { Project, Skill, Experience, Education, GlobalSettings, Theme, SocialLink } from '../types/portfolio';
 
 export const DEFAULT_THEME: Theme = {
   bg: '#0a0a0a',
@@ -79,6 +79,18 @@ export const DEFAULT_EXPERIENCES: Experience[] = [
     company: 'Agência Criativa',
     desc: 'Desenvolvimento de campanhas multicanal, social media e materiais impressos.',
     desc_en: 'Development of multichannel campaigns, social media and print materials.',
+  },
+];
+
+export const DEFAULT_EDUCATION: Education[] = [
+  {
+    id: '1',
+    period: '2018 — 2022',
+    course: 'Design Gráfico',
+    course_en: 'Graphic Design',
+    school: 'Universidade Federal',
+    desc: 'Bacharelado com foco em identidade visual, tipografia e branding.',
+    desc_en: 'Bachelor degree focused on visual identity, typography and branding.',
   },
 ];
 
