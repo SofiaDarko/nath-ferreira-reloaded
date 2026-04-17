@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      education: {
+        Row: {
+          course: string
+          course_en: string | null
+          description: string
+          description_en: string | null
+          id: string
+          period: string
+          school: string
+          sort_order: number
+        }
+        Insert: {
+          course: string
+          course_en?: string | null
+          description?: string
+          description_en?: string | null
+          id?: string
+          period: string
+          school?: string
+          sort_order?: number
+        }
+        Update: {
+          course?: string
+          course_en?: string | null
+          description?: string
+          description_en?: string | null
+          id?: string
+          period?: string
+          school?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
