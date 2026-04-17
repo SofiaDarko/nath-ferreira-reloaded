@@ -299,6 +299,48 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     setExpDescEn(e.desc_en || '');
   };
 
+  const saveEducation = () => {
+    if (!eduCourse || !eduPeriod) return;
+    if (editingEduId) {
+      setEducation((prev) => prev.map((ed) => ed.id === editingEduId ? {
+        ...ed, period: eduPeriod, course: eduCourse, course_en: eduCourseEn || undefined,
+        school: eduSchool, desc: eduDesc, desc_en: eduDescEn || undefined,
+      } : ed));
+    } else {
+      const newEdu: Education = {
+        id: crypto.randomUUID(), period: eduPeriod, course: eduCourse, course_en: eduCourseEn || undefined,
+        school: eduSchool, desc: eduDesc, desc_en: eduDescEn || undefined,
+      };
+      setEducation((prev) => [...prev, newEdu]);
+    }
+    clearEduForm();
+  };
+
+  const clearEduForm = () => {
+    setEditingEduId(null);
+    setEduPeriod(''); setEduCourse(''); setEduCourseEn(''); setEduSchool(''); setEduDesc(''); setEduDescEn('');
+  };
+
+  const editEducation = (ed: Education) => {
+    setEditingEduId(ed.id);
+    setEduPeriod(ed.period);
+    setEduCourse(ed.course);
+    setEduCourseEn(ed.course_en || '');
+    setEduSchool(ed.school);
+    setEduDesc(ed.desc);
+    setEduDescEn(ed.desc_en || '');
+  };
+
+  const moveEducation = (index: number, direction: -1 | 1) => {
+    setEducation((prev) => {
+      const arr = [...prev];
+      const target = index + direction;
+      if (target < 0 || target >= arr.length) return prev;
+      [arr[index], arr[target]] = [arr[target], arr[index]];
+      return arr;
+    });
+  };
+
   const tabs = [
     { id: 'projects' as const, label: lang === 'pt' ? 'Projetos' : 'Projects' },
     { id: 'about' as const, label: lang === 'pt' ? 'Sobre' : 'About' },
