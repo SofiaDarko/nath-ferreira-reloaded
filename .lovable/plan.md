@@ -1,57 +1,59 @@
 
 
-## Migração Total: localStorage → Banco de Dados
+## Plano: CRUD de Formação Acadêmica
 
-### 1. Migração SQL (automática via integração)
+### Ponto de restauração
+Antes de qualquer alteração, esta mensagem fica como **checkpoint de restauração**. Se algo der errado, basta clicar no botão "Revert" abaixo da minha mensagem anterior (a que termina com a migração total para o banco) — isso restaura o projeto ao estado atual sem perder nada.
 
-Criar 4 tabelas com RLS:
+Ao final da implementação, vou também marcar uma mensagem clara para você reverter caso prefira voltar logo após esta feature.
 
-- **projects** — id (uuid), name, name_en, description, description_en, tags (text[]), thumb, images (text[]), sort_order, created_at
-- **skills** — id (uuid), name, icon, color, bg, special (bool), icon_url, sort_order
-- **experiences** — id (uuid), period, title, title_en, company, description, description_en, sort_order
-- **site_settings** — id (int, CHECK id=1), theme (jsonb), global_settings (jsonb), social_links (jsonb), editable_texts (jsonb), user_photo (text), updated_at
+### Arquivos que serão alterados (apenas o necessário)
 
-RLS: public SELECT em todas; authenticated ALL em todas.
+1. **Migração SQL** — nova tabela `education` (não toca nas existentes)
+2. **`src/types/portfolio.ts`** — adicionar interface `Education` (apenas append)
+3. **`src/data/defaults.ts`** — adicionar `DEFAULT_EDUCATION` (apenas append)
+4. **`src/hooks/usePortfolioData.ts`** — adicionar education ao hook (segue padrão de experiences)
+5. **`src/components/portfolio/AboutPage.tsx`** — substituir bloco fixo de Formação por `.map()` sobre a lista
+6. **`src/components/portfolio/AdminPanel.tsx`** — adicionar seção CRUD na aba "Sobre"
+7. **`src/pages/Index.tsx`** — propagar 3 props novas
 
-### 2. Novo arquivo: `src/hooks/usePortfolioData.ts`
+### Arquivos que NÃO serão tocados
+- Layout/estilo da Bento Grid e proporções (HomePage, ProjectModal, etc.)
+- ContactPage, PortfolioSidebar, LanguageSwitcher
+- Edge functions de email (os erros de build pré-existentes não bloqueiam o site)
+- `client.ts`, `types.ts` do Supabase (atualizado automaticamente)
 
-Hook que:
-- Busca dados das 4 tabelas ao montar
-- Se tabelas vazias, insere defaults de `defaults.ts` (seed automático)
-- Retorna state + setters que gravam no banco via upsert/insert/update/delete
-- Expõe `loading` boolean
+### Estrutura da nova tabela `education`
+- `id` uuid PK
+- `period` text (ex: "2018 — 2022")
+- `course` text + `course_en` text nullable
+- `school` text
+- `description` text + `description_en` text nullable
+- `sort_order` int
+- RLS: public SELECT, authenticated ALL (mesmo padrão das outras)
 
-### 3. Refatorar `src/pages/Index.tsx`
+### Interface
+```ts
+export interface Education {
+  id: string;
+  period: string;
+  course: string;
+  course_en?: string;
+  school: string;
+  desc: string;
+  desc_en?: string;
+}
+```
 
-- Remover `loadState` e todos `useEffect` de `localStorage.setItem`
-- Usar `usePortfolioData` para obter dados + setters
-- Adicionar loading state mínimo
-- Manter toda a estrutura visual intacta
+### UI no AdminPanel (aba "Sobre")
+Nova seção "Formação Acadêmica" com:
+- Form: Período | Curso (PT/EN) | Instituição | Descrição (PT/EN)
+- Botões: Salvar / Limpar
+- Lista de formações com Editar / ↑ / ↓ / Excluir
 
-### 4. Refatorar `src/components/portfolio/AdminPanel.tsx`
+### UI no AboutPage (Painel 2)
+Substitui os 4 campos editáveis fixos por `.map()` sobre `education[]` (read-only para visitantes).
 
-- `saveProject`, `saveSkill`, `saveExperience` → chamam `supabase.from(...).upsert/insert`
-- Delete → `supabase.from(...).delete()`
-- Reordenação → atualiza `sort_order`
-- Theme/globalSettings/socialLinks → upsert em `site_settings`
-- Remover referências a localStorage
-
-### Mapeamento DB ↔ TypeScript
-| TS field | DB column |
-|---|---|
-| `Project.description` | `projects.description` |
-| `Skill.iconUrl` | `skills.icon_url` |
-| `Experience.desc` | `experiences.description` |
-| `Experience.desc_en` | `experiences.description_en` |
-
-### Arquivos alterados
-1. Migração SQL (4 tabelas) — via ferramenta de migração
-2. `src/hooks/usePortfolioData.ts` — novo
-3. `src/pages/Index.tsx` — refatorar dados
-4. `src/components/portfolio/AdminPanel.tsx` — CRUD via banco
-
-### Arquivos NÃO alterados
-- Layout/estilo (HomePage, AboutPage, ContactPage, ProjectModal, etc.)
-- `src/types/portfolio.ts`
-- `src/data/defaults.ts`
+### Sobre os erros de build
+Os erros em `process-email-queue/index.ts` são **pré-existentes** e não relacionados a esta feature. Não vou tocar nesses arquivos.
 
