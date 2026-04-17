@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import EditableText from './EditableText';
-import type { Skill, Experience, EditableTexts, GlobalSettings } from '../../types/portfolio';
+import type { Skill, Experience, Education, EditableTexts, GlobalSettings } from '../../types/portfolio';
 
 interface AboutPageProps {
   isEditing: boolean;
@@ -11,12 +11,13 @@ interface AboutPageProps {
   userPhoto: string | null;
   skills: Skill[];
   experiences: Experience[];
+  education: Education[];
   t: Record<string, string>;
   lang: string;
   globalSettings: GlobalSettings;
 }
 
-const AboutPage: React.FC<AboutPageProps> = ({ isEditing, editableTexts, onTextChange, userPhoto, skills, experiences, t, lang, globalSettings }) => {
+const AboutPage: React.FC<AboutPageProps> = ({ isEditing, editableTexts, onTextChange, userPhoto, skills, experiences, education, t, lang, globalSettings }) => {
   const [panel, setPanel] = useState(0);
   const totalPanels = 3;
 
@@ -97,14 +98,26 @@ const AboutPage: React.FC<AboutPageProps> = ({ isEditing, editableTexts, onTextC
           </div>
           <div className="font-display text-[10px] font-normal tracking-[0.22em] uppercase text-accent mb-9">— {educationTitle}</div>
           <div className="flex flex-col gap-7 max-w-[680px]">
-            <div className="grid grid-cols-[130px,1fr] gap-7 pb-7 border-b border-border last:border-0">
-              <EditableText id={`edu-period-${lang}`} isEditing={isEditing} value={editableTexts[`edu-period-${lang}`] || t.eduPeriod} onChange={onTextChange} className="font-display text-[10px] text-muted-foreground tracking-wide pt-1" />
-              <div>
-                <EditableText id={`edu-title-${lang}`} isEditing={isEditing} value={editableTexts[`edu-title-${lang}`] || t.eduTitle} onChange={onTextChange} className="font-display text-[15px] font-normal mb-1 tracking-tight" />
-                <EditableText id={`edu-school-${lang}`} isEditing={isEditing} value={editableTexts[`edu-school-${lang}`] || t.eduSchool} onChange={onTextChange} className="text-xs text-accent mb-2 font-medium tracking-wide" />
-                <EditableText id={`edu-desc-${lang}`} isEditing={isEditing} value={editableTexts[`edu-desc-${lang}`] || t.eduDesc} onChange={onTextChange} className="text-[13px] leading-relaxed text-fg/55" />
+            {education.length === 0 ? (
+              <div className="text-[12px] text-muted-foreground/60">
+                {lang === 'pt' ? 'Nenhuma formação cadastrada.' : 'No education entries yet.'}
               </div>
-            </div>
+            ) : (
+              education.map((ed) => {
+                const course = lang === 'en' && ed.course_en ? ed.course_en : ed.course;
+                const desc = lang === 'en' && ed.desc_en ? ed.desc_en : ed.desc;
+                return (
+                  <div key={ed.id} className="grid grid-cols-[130px,1fr] gap-7 pb-7 border-b border-border last:border-0">
+                    <div className="font-display text-[10px] text-muted-foreground tracking-wide pt-1">{ed.period}</div>
+                    <div>
+                      <div className="font-display text-[15px] font-normal mb-1 tracking-tight">{course}</div>
+                      <div className="text-xs text-accent mb-2 font-medium tracking-wide">{ed.school}</div>
+                      {desc && <div className="text-[13px] leading-relaxed text-fg/55">{desc}</div>}
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
 

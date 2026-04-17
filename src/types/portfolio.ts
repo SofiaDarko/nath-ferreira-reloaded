@@ -36,6 +36,16 @@ export interface Experience {
   desc_en?: string;
 }
 
+export interface Education {
+  id: string;
+  period: string;
+  course: string;
+  course_en?: string;
+  school: string;
+  desc: string;
+  desc_en?: string;
+}
+
 export interface EditableTexts {
   [key: string]: string;
 }

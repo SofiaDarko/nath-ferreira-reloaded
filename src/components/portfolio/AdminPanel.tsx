@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { motion } from 'motion/react';
 import { X, Plus, Trash2, Pencil, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
 import { HexColorPicker } from 'react-colorful';
-import type { Project, Skill, Experience, EditableTexts, Theme, GlobalSettings, SocialLink } from '../../types/portfolio';
+import type { Project, Skill, Experience, Education, EditableTexts, Theme, GlobalSettings, SocialLink } from '../../types/portfolio';
 import { TAG_OPTIONS } from '../../data/translations';
 import { DEFAULT_THEME } from '../../data/defaults';
 import { toast } from 'sonner';
@@ -21,6 +21,9 @@ interface AdminPanelProps {
   experiences: Experience[];
   setExperiences: React.Dispatch<React.SetStateAction<Experience[]>>;
   deleteExperience: (id: string) => Promise<void>;
+  education: Education[];
+  setEducation: React.Dispatch<React.SetStateAction<Education[]>>;
+  deleteEducation: (id: string) => Promise<void>;
   socialLinks: SocialLink[];
   setSocialLinks: React.Dispatch<React.SetStateAction<SocialLink[]>>;
   editableTexts: EditableTexts;
@@ -34,7 +37,7 @@ interface AdminPanelProps {
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = ({
-  projects, setProjects, deleteProject, onClose, setUserPhoto, userPhoto, skills, setSkills, deleteSkill, experiences, setExperiences, deleteExperience, socialLinks, setSocialLinks, t, lang, theme, setTheme, globalSettings, setGlobalSettings,
+  projects, setProjects, deleteProject, onClose, setUserPhoto, userPhoto, skills, setSkills, deleteSkill, experiences, setExperiences, deleteExperience, education, setEducation, deleteEducation, socialLinks, setSocialLinks, t, lang, theme, setTheme, globalSettings, setGlobalSettings,
 }) => {
   const [activeTab, setActiveTab] = useState<'projects' | 'about' | 'appearance' | 'globalTexts' | 'contact'>('projects');
 
@@ -70,6 +73,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const [expCompany, setExpCompany] = useState('');
   const [expDesc, setExpDesc] = useState('');
   const [expDescEn, setExpDescEn] = useState('');
+
+  // Education Form
+  const [editingEduId, setEditingEduId] = useState<string | null>(null);
+  const [eduPeriod, setEduPeriod] = useState('');
+  const [eduCourse, setEduCourse] = useState('');
+  const [eduCourseEn, setEduCourseEn] = useState('');
+  const [eduSchool, setEduSchool] = useState('');
+  const [eduDesc, setEduDesc] = useState('');
+  const [eduDescEn, setEduDescEn] = useState('');
 
   const [colorTarget, setColorTarget] = useState<keyof Theme | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -285,6 +297,48 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     setExpCompany(e.company);
     setExpDesc(e.desc);
     setExpDescEn(e.desc_en || '');
+  };
+
+  const saveEducation = () => {
+    if (!eduCourse || !eduPeriod) return;
+    if (editingEduId) {
+      setEducation((prev) => prev.map((ed) => ed.id === editingEduId ? {
+        ...ed, period: eduPeriod, course: eduCourse, course_en: eduCourseEn || undefined,
+        school: eduSchool, desc: eduDesc, desc_en: eduDescEn || undefined,
+      } : ed));
+    } else {
+      const newEdu: Education = {
+        id: crypto.randomUUID(), period: eduPeriod, course: eduCourse, course_en: eduCourseEn || undefined,
+        school: eduSchool, desc: eduDesc, desc_en: eduDescEn || undefined,
+      };
+      setEducation((prev) => [...prev, newEdu]);
+    }
+    clearEduForm();
+  };
+
+  const clearEduForm = () => {
+    setEditingEduId(null);
+    setEduPeriod(''); setEduCourse(''); setEduCourseEn(''); setEduSchool(''); setEduDesc(''); setEduDescEn('');
+  };
+
+  const editEducation = (ed: Education) => {
+    setEditingEduId(ed.id);
+    setEduPeriod(ed.period);
+    setEduCourse(ed.course);
+    setEduCourseEn(ed.course_en || '');
+    setEduSchool(ed.school);
+    setEduDesc(ed.desc);
+    setEduDescEn(ed.desc_en || '');
+  };
+
+  const moveEducation = (index: number, direction: -1 | 1) => {
+    setEducation((prev) => {
+      const arr = [...prev];
+      const target = index + direction;
+      if (target < 0 || target >= arr.length) return prev;
+      [arr[index], arr[target]] = [arr[target], arr[index]];
+      return arr;
+    });
   };
 
   const tabs = [
@@ -602,6 +656,55 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                     </div>
                   </div>
                 ))}
+              </div>
+
+              {/* ── Formação Acadêmica ──────────────────────────── */}
+              <h3 className="font-display text-[10px] tracking-[0.18em] uppercase text-muted-foreground mt-10 mb-6">
+                {editingEduId
+                  ? (lang === 'pt' ? 'Editando Formação' : 'Editing Education')
+                  : (lang === 'pt' ? 'Adicionar Formação Acadêmica' : 'Add Education')}
+              </h3>
+              <div className="flex flex-col gap-3">
+                <input type="text" value={eduPeriod} onChange={(e) => setEduPeriod(e.target.value)} placeholder={lang === 'pt' ? 'Período (ex: 2018 — 2022)' : 'Period (e.g. 2018 — 2022)'} className={inputClass} />
+                <input type="text" value={eduCourse} onChange={(e) => setEduCourse(e.target.value)} placeholder={lang === 'pt' ? 'Curso (PT)' : 'Course (PT)'} className={inputClass} />
+                <input type="text" value={eduCourseEn} onChange={(e) => setEduCourseEn(e.target.value)} placeholder="Course (EN)" className={inputClass} />
+                <input type="text" value={eduSchool} onChange={(e) => setEduSchool(e.target.value)} placeholder={lang === 'pt' ? 'Instituição' : 'Institution'} className={inputClass} />
+                <textarea value={eduDesc} onChange={(e) => setEduDesc(e.target.value)} placeholder={lang === 'pt' ? 'Descrição (PT) — opcional' : 'Description (PT) — optional'} className={`${inputClass} min-h-[60px] resize-y`} />
+                <textarea value={eduDescEn} onChange={(e) => setEduDescEn(e.target.value)} placeholder="Description (EN) — optional" className={`${inputClass} min-h-[60px] resize-y`} />
+                <div className="flex gap-3 mt-1">
+                  <button className="bg-accent text-bg rounded-lg py-2.5 px-5 font-display text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:opacity-80 w-fit" onClick={saveEducation}>
+                    <Plus size={12} className="inline mr-1" />
+                    {editingEduId
+                      ? (lang === 'pt' ? 'Salvar Alterações' : 'Save Changes')
+                      : (lang === 'pt' ? 'Adicionar Formação' : 'Add Education')}
+                  </button>
+                  {editingEduId && (
+                    <button className="border border-border text-muted-foreground rounded-lg py-2.5 px-5 font-display text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:opacity-80" onClick={clearEduForm}>
+                      {lang === 'pt' ? 'Cancelar' : 'Cancel'}
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2.5 mt-6">
+                {education.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">{lang === 'pt' ? 'Nenhuma formação cadastrada.' : 'No education entries yet.'}</p>
+                ) : (
+                  education.map((ed, i) => (
+                    <div key={ed.id} className="flex items-center justify-between p-3 border border-border rounded-xl hover:border-muted transition-colors">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-display text-[12px] tracking-tight">{ed.course}</div>
+                        <div className="text-[10px] text-muted-foreground">{ed.school} · {ed.period}</div>
+                      </div>
+                      <div className="flex items-center gap-1.5 flex-shrink-0 ml-3">
+                        <button disabled={i === 0} className={`w-7 h-7 border border-accent/40 rounded-md flex items-center justify-center text-accent hover:bg-accent/10 transition-colors ${i === 0 ? 'opacity-30 pointer-events-none' : ''}`} onClick={() => moveEducation(i, -1)}><ArrowUp size={12} /></button>
+                        <button disabled={i === education.length - 1} className={`w-7 h-7 border border-accent/40 rounded-md flex items-center justify-center text-accent hover:bg-accent/10 transition-colors ${i === education.length - 1 ? 'opacity-30 pointer-events-none' : ''}`} onClick={() => moveEducation(i, 1)}><ArrowDown size={12} /></button>
+                        <button className="w-7 h-7 border border-accent/40 rounded-md flex items-center justify-center text-accent hover:bg-accent/10 transition-colors" onClick={() => editEducation(ed)} title={t.edit}><Pencil size={12} /></button>
+                        <button className="w-7 h-7 border border-accent2/40 rounded-md flex items-center justify-center text-accent2 hover:bg-accent2/10 transition-colors" onClick={() => deleteEducation(ed.id)}><Trash2 size={12} /></button>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           )}

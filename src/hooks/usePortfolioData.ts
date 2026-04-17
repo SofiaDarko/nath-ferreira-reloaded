@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import type { Project, Skill, Experience, EditableTexts, Theme, GlobalSettings, SocialLink } from '../types/portfolio';
+import type { Project, Skill, Experience, Education, EditableTexts, Theme, GlobalSettings, SocialLink } from '../types/portfolio';
 import {
   DEFAULT_THEME,
   DEFAULT_GLOBAL_SETTINGS,
   DEFAULT_SKILLS,
   DEFAULT_EXPERIENCES,
+  DEFAULT_EDUCATION,
   DEFAULT_PROJECTS,
   DEFAULT_SOCIAL_LINKS,
 } from '../data/defaults';
@@ -89,6 +90,31 @@ function experienceToDb(e: Experience, sortOrder: number) {
   };
 }
 
+function dbToEducation(r: any): Education {
+  return {
+    id: r.id,
+    period: r.period,
+    course: r.course,
+    course_en: r.course_en ?? undefined,
+    school: r.school,
+    desc: r.description,
+    desc_en: r.description_en ?? undefined,
+  };
+}
+
+function educationToDb(ed: Education, sortOrder: number) {
+  return {
+    id: ed.id,
+    period: ed.period,
+    course: ed.course,
+    course_en: ed.course_en ?? null,
+    school: ed.school,
+    description: ed.desc,
+    description_en: ed.desc_en ?? null,
+    sort_order: sortOrder,
+  };
+}
+
 /* ── Hook ─────────────────────────────────────────────────────── */
 
 export function usePortfolioData() {
@@ -97,6 +123,7 @@ export function usePortfolioData() {
   const [projects, setProjectsLocal] = useState<Project[]>(DEFAULT_PROJECTS);
   const [skills, setSkillsLocal] = useState<Skill[]>(DEFAULT_SKILLS);
   const [experiences, setExperiencesLocal] = useState<Experience[]>(DEFAULT_EXPERIENCES);
+  const [education, setEducationLocal] = useState<Education[]>(DEFAULT_EDUCATION);
   const [editableTexts, setEditableTextsLocal] = useState<EditableTexts>({});
   const [userPhoto, setUserPhotoLocal] = useState<string | null>(null);
   const [theme, setThemeLocal] = useState<Theme>(DEFAULT_THEME);
@@ -110,10 +137,11 @@ export function usePortfolioData() {
 
     async function load() {
       try {
-        const [projRes, skillRes, expRes, settRes] = await Promise.all([
+        const [projRes, skillRes, expRes, eduRes, settRes] = await Promise.all([
           supabase.from('projects').select('*').order('sort_order'),
           supabase.from('skills').select('*').order('sort_order'),
           supabase.from('experiences').select('*').order('sort_order'),
+          supabase.from('education' as any).select('*').order('sort_order'),
           supabase.from('site_settings').select('*').eq('id', 1).maybeSingle(),
         ]);
 
@@ -136,6 +164,12 @@ export function usePortfolioData() {
 
         if (!expRes.error && expRes.data && expRes.data.length > 0) {
           setExperiencesLocal(expRes.data.map(dbToExperience));
+        } else {
+          needsSeed = true;
+        }
+
+        if (!eduRes.error && eduRes.data && eduRes.data.length > 0) {
+          setEducationLocal((eduRes.data as any[]).map(dbToEducation));
         } else {
           needsSeed = true;
         }
@@ -178,6 +212,10 @@ export function usePortfolioData() {
     // Insert default experiences
     const expInserts = DEFAULT_EXPERIENCES.map((e, i) => experienceToDb(e, i));
     await supabase.from('experiences').upsert(expInserts, { onConflict: 'id' });
+
+    // Insert default education
+    const eduInserts = DEFAULT_EDUCATION.map((ed, i) => educationToDb(ed, i));
+    await supabase.from('education' as any).upsert(eduInserts as any, { onConflict: 'id' });
 
     // Insert default settings
     await supabase.from('site_settings').upsert({
@@ -251,6 +289,20 @@ export function usePortfolioData() {
     await supabase.from('experiences').delete().eq('id', id);
   }, []);
 
+  const setEducation: React.Dispatch<React.SetStateAction<Education[]>> = useCallback((action) => {
+    setEducationLocal((prev) => {
+      const next = typeof action === 'function' ? action(prev) : action;
+      const rows = next.map((ed, i) => educationToDb(ed, i));
+      supabase.from('education' as any).upsert(rows as any, { onConflict: 'id' }).then();
+      return next;
+    });
+  }, []);
+
+  const deleteEducation = useCallback(async (id: string) => {
+    setEducationLocal((prev) => prev.filter((ed) => ed.id !== id));
+    await supabase.from('education' as any).delete().eq('id', id);
+  }, []);
+
   const setTheme: React.Dispatch<React.SetStateAction<Theme>> = useCallback((action) => {
     setThemeLocal((prev) => {
       const next = typeof action === 'function' ? action(prev) : action;
@@ -293,6 +345,7 @@ export function usePortfolioData() {
     projects, setProjects, deleteProject,
     skills, setSkills, deleteSkill,
     experiences, setExperiences, deleteExperience,
+    education, setEducation, deleteEducation,
     editableTexts, setEditableTexts,
     userPhoto, setUserPhoto,
     theme, setTheme,

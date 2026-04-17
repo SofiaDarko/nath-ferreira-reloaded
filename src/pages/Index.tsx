@@ -23,6 +23,7 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
     projects, setProjects, deleteProject,
     skills, setSkills, deleteSkill,
     experiences, setExperiences, deleteExperience,
+    education, setEducation, deleteEducation,
     editableTexts, setEditableTexts,
     userPhoto, setUserPhoto,
     theme, setTheme,
@@ -169,6 +170,7 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
               userPhoto={userPhoto}
               skills={skills}
               experiences={experiences}
+              education={education}
               t={t}
               lang={lang}
               globalSettings={globalSettings}
@@ -207,6 +209,9 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
             experiences={experiences}
             setExperiences={setExperiences}
             deleteExperience={deleteExperience}
+            education={education}
+            setEducation={setEducation}
+            deleteEducation={deleteEducation}
             socialLinks={socialLinks}
             setSocialLinks={setSocialLinks}
             editableTexts={editableTexts}
