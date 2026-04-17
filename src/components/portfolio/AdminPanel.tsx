@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { motion } from 'motion/react';
 import { X, Plus, Trash2, Pencil, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
 import { HexColorPicker } from 'react-colorful';
-import type { Project, Skill, Experience, EditableTexts, Theme, GlobalSettings, SocialLink } from '../../types/portfolio';
+import type { Project, Skill, Experience, Education, EditableTexts, Theme, GlobalSettings, SocialLink } from '../../types/portfolio';
 import { TAG_OPTIONS } from '../../data/translations';
 import { DEFAULT_THEME } from '../../data/defaults';
 import { toast } from 'sonner';
@@ -21,6 +21,9 @@ interface AdminPanelProps {
   experiences: Experience[];
   setExperiences: React.Dispatch<React.SetStateAction<Experience[]>>;
   deleteExperience: (id: string) => Promise<void>;
+  education: Education[];
+  setEducation: React.Dispatch<React.SetStateAction<Education[]>>;
+  deleteEducation: (id: string) => Promise<void>;
   socialLinks: SocialLink[];
   setSocialLinks: React.Dispatch<React.SetStateAction<SocialLink[]>>;
   editableTexts: EditableTexts;
@@ -34,7 +37,7 @@ interface AdminPanelProps {
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = ({
-  projects, setProjects, deleteProject, onClose, setUserPhoto, userPhoto, skills, setSkills, deleteSkill, experiences, setExperiences, deleteExperience, socialLinks, setSocialLinks, t, lang, theme, setTheme, globalSettings, setGlobalSettings,
+  projects, setProjects, deleteProject, onClose, setUserPhoto, userPhoto, skills, setSkills, deleteSkill, experiences, setExperiences, deleteExperience, education, setEducation, deleteEducation, socialLinks, setSocialLinks, t, lang, theme, setTheme, globalSettings, setGlobalSettings,
 }) => {
   const [activeTab, setActiveTab] = useState<'projects' | 'about' | 'appearance' | 'globalTexts' | 'contact'>('projects');
 
@@ -70,6 +73,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const [expCompany, setExpCompany] = useState('');
   const [expDesc, setExpDesc] = useState('');
   const [expDescEn, setExpDescEn] = useState('');
+
+  // Education Form
+  const [editingEduId, setEditingEduId] = useState<string | null>(null);
+  const [eduPeriod, setEduPeriod] = useState('');
+  const [eduCourse, setEduCourse] = useState('');
+  const [eduCourseEn, setEduCourseEn] = useState('');
+  const [eduSchool, setEduSchool] = useState('');
+  const [eduDesc, setEduDesc] = useState('');
+  const [eduDescEn, setEduDescEn] = useState('');
 
   const [colorTarget, setColorTarget] = useState<keyof Theme | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
