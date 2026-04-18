@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Images, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Project } from '../../types/portfolio';
@@ -12,11 +12,25 @@ interface ProjectModalProps {
 const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose, lang }) => {
   const [imgIdx, setImgIdx] = useState(0);
 
-  const next = () => setImgIdx((i) => Math.min(i + 1, project.images.length - 1));
-  const prev = () => setImgIdx((i) => Math.max(i - 1, 0));
+  const next = useCallback(
+    () => setImgIdx((i) => Math.min(i + 1, project.images.length - 1)),
+    [project.images.length]
+  );
+  const prev = useCallback(() => setImgIdx((i) => Math.max(i - 1, 0)), []);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') next();
+      else if (e.key === 'ArrowLeft') prev();
+      else if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [next, prev, onClose]);
 
   const name = lang === 'en' && project.name_en ? project.name_en : project.name;
   const description = lang === 'en' && project.description_en ? project.description_en : project.description;
+  const hasMultiple = project.images.length > 1;
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[300] bg-bg/95 backdrop-blur-xl flex" onClick={onClose}>
@@ -28,7 +42,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose, lang }) =
               <X size={16} />
             </button>
             <div className="font-display text-[10px] tracking-[0.2em] uppercase text-accent mb-5">— {lang === 'pt' ? 'Projeto' : 'Project'}</div>
-            <h3 className="font-display text-3xl font-normal tracking-tight mb-5 leading-tight">{name}</h3>
+            <h3 className="font-display text-3xl font-normal tracking-tight mb-5 leading-tight text-fg">{name}</h3>
             <p className="font-body text-sm leading-relaxed text-fg/60 mb-8 whitespace-pre-wrap">{description}</p>
             <div className="flex flex-wrap gap-2">
               {project.tags.map((tag) => (
@@ -44,25 +58,6 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose, lang }) =
               </span>
             </div>
           </div>
-
-          {project.images.length > 1 && (
-            <div className="flex gap-3">
-              <button
-                className="w-12 h-12 rounded-full flex items-center justify-center bg-accent text-bg transition-opacity hover:opacity-85 disabled:opacity-30 disabled:pointer-events-none"
-                onClick={prev}
-                disabled={imgIdx === 0}
-              >
-                <ChevronLeft size={20} />
-              </button>
-              <button
-                className="w-12 h-12 rounded-full flex items-center justify-center bg-accent text-bg transition-opacity hover:opacity-85 disabled:opacity-30 disabled:pointer-events-none"
-                onClick={next}
-                disabled={imgIdx === project.images.length - 1}
-              >
-                <ChevronRight size={20} />
-              </button>
-            </div>
-          )}
         </motion.div>
 
         {/* Right image area */}
@@ -84,10 +79,29 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose, lang }) =
               />
             </AnimatePresence>
           </div>
-          {project.images.length > 1 && (
-            <div className="absolute bottom-11 left-10 font-display text-[10px] tracking-widest text-muted-foreground">
-              {imgIdx + 1} / {project.images.length}
-            </div>
+
+          {hasMultiple && (
+            <>
+              <button
+                aria-label={lang === 'pt' ? 'Imagem anterior' : 'Previous image'}
+                className="absolute top-1/2 -translate-y-1/2 left-6 z-10 w-12 h-12 rounded-full flex items-center justify-center bg-bg/70 backdrop-blur-sm border border-border text-fg transition-all hover:border-accent hover:text-accent hover:bg-bg disabled:opacity-30 disabled:pointer-events-none"
+                onClick={prev}
+                disabled={imgIdx === 0}
+              >
+                <ChevronLeft size={22} />
+              </button>
+              <button
+                aria-label={lang === 'pt' ? 'Próxima imagem' : 'Next image'}
+                className="absolute top-1/2 -translate-y-1/2 right-6 z-10 w-12 h-12 rounded-full flex items-center justify-center bg-bg/70 backdrop-blur-sm border border-border text-fg transition-all hover:border-accent hover:text-accent hover:bg-bg disabled:opacity-30 disabled:pointer-events-none"
+                onClick={next}
+                disabled={imgIdx === project.images.length - 1}
+              >
+                <ChevronRight size={22} />
+              </button>
+              <div className="absolute bottom-11 left-10 font-display text-[10px] tracking-widest text-muted-foreground">
+                {imgIdx + 1} / {project.images.length}
+              </div>
+            </>
           )}
         </div>
       </div>

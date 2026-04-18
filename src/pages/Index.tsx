@@ -13,6 +13,32 @@ import { TRANSLATIONS } from '../data/translations';
 import { usePortfolioData } from '../hooks/usePortfolioData';
 import type { Project, PageId, Lang } from '../types/portfolio';
 
+// Convert hex (#rgb, #rrggbb, #rrggbbaa) to "H S% L%" string for CSS HSL vars
+function hexToHsl(hex: string): string {
+  if (!hex) return '0 0% 0%';
+  let h = hex.replace('#', '').trim();
+  if (h.length === 3) h = h.split('').map((c) => c + c).join('');
+  if (h.length === 8) h = h.slice(0, 6); // ignore alpha
+  if (h.length !== 6) return '0 0% 0%';
+  const r = parseInt(h.slice(0, 2), 16) / 255;
+  const g = parseInt(h.slice(2, 4), 16) / 255;
+  const b = parseInt(h.slice(4, 6), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let hue = 0, sat = 0;
+  const lum = (max + min) / 2;
+  if (max !== min) {
+    const d = max - min;
+    sat = lum > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: hue = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: hue = (b - r) / d + 2; break;
+      case b: hue = (r - g) / d + 4; break;
+    }
+    hue *= 60;
+  }
+  return `${Math.round(hue)} ${Math.round(sat * 100)}% ${Math.round(lum * 100)}%`;
+}
+
 const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
   const [lang, setLang] = useState<Lang>('pt');
   const [currentPage, setCurrentPage] = useState<PageId>('home');
@@ -116,7 +142,7 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
 
   return (
     <div className="flex h-screen w-screen overflow-hidden font-body" style={{ backgroundColor: theme.bg, color: theme.fg }}>
-      {/* Dynamic theme CSS variables */}
+      {/* Dynamic theme CSS variables — sync hex theme with Tailwind HSL tokens */}
       <style dangerouslySetInnerHTML={{ __html: `
         :root {
           --theme-bg: ${theme.bg};
@@ -133,6 +159,36 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
           --theme-hover-border: ${theme.hoverBorder};
           --theme-link-color: ${theme.linkColor};
           --theme-card-border: ${theme.cardBorder};
+
+          --bg: ${hexToHsl(theme.bg)};
+          --background: ${hexToHsl(theme.bg)};
+          --card: ${hexToHsl(theme.bg)};
+          --popover: ${hexToHsl(theme.bg)};
+          --sidebar-background: ${hexToHsl(theme.bg)};
+
+          --fg: ${hexToHsl(theme.fg)};
+          --foreground: ${hexToHsl(theme.fg)};
+          --card-foreground: ${hexToHsl(theme.fg)};
+          --popover-foreground: ${hexToHsl(theme.fg)};
+          --secondary-foreground: ${hexToHsl(theme.fg)};
+          --sidebar-accent-foreground: ${hexToHsl(theme.fg)};
+
+          --accent: ${hexToHsl(theme.accent)};
+          --primary: ${hexToHsl(theme.accent)};
+          --ring: ${hexToHsl(theme.accent)};
+          --sidebar-ring: ${hexToHsl(theme.accent)};
+          --sidebar-primary: ${hexToHsl(theme.accent)};
+
+          --accent2: ${hexToHsl(theme.accent2)};
+          --destructive: ${hexToHsl(theme.accent2)};
+
+          --border: ${hexToHsl(theme.border)};
+          --input: ${hexToHsl(theme.border)};
+          --border-color: ${hexToHsl(theme.border)};
+          --sidebar-border: ${hexToHsl(theme.border)};
+
+          --muted-foreground: ${hexToHsl(theme.muted)};
+          --sidebar-foreground: ${hexToHsl(theme.muted)};
         }
       `}} />
 
