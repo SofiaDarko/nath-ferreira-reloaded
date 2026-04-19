@@ -246,6 +246,7 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
           --theme-hover-border: ${theme.hoverBorder};
           --theme-link-color: ${theme.linkColor};
           --theme-card-border: ${theme.cardBorder};
+          --theme-project-hover-title: ${theme.projectHoverTitleColor};
 
           --bg: ${hexToHsl(theme.bg)};
           --background: ${hexToHsl(theme.bg)};
