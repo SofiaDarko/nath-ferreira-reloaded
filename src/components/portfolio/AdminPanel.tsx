@@ -403,6 +403,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     { key: 'tagText', label: lang === 'pt' ? 'Texto das Tags' : 'Tag Text' },
     { key: 'hoverBorder', label: lang === 'pt' ? 'Borda Hover' : 'Hover Border' },
     { key: 'linkColor', label: lang === 'pt' ? 'Cor dos Links' : 'Link Color' },
+    { key: 'projectHoverTitleColor', label: lang === 'pt' ? 'Título do Projeto (hover)' : 'Project Title (hover)' },
   ];
 
   return (

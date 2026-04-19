@@ -66,7 +66,7 @@ function ProjectCard({ project, onClick, index, lang, variant, style }: {
       <div className="image-protect-wrapper absolute inset-0 z-[1] rounded-2xl" />
       <div className="absolute inset-[3px] rounded-2xl border-2 border-[var(--theme-card-border,#c8f564)] group-hover:border-[var(--theme-card-border,#c8f564)] transition-colors duration-300 z-20 pointer-events-none" />
       <div className="absolute inset-0 flex flex-col items-start justify-end p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 z-10">
-        <div className="font-display text-sm font-bold mb-2 tracking-tight" style={{ color: 'var(--theme-fg, #fff)' }}>{name}</div>
+        <div className="font-display text-sm font-bold mb-2 tracking-tight" style={{ color: 'var(--theme-project-hover-title, var(--theme-fg, #fff))' }}>{name}</div>
         <div className="flex flex-wrap gap-1.5">
           {project.tags.map((tag) => (
             <span key={tag} className="font-body text-[10px] font-medium tracking-widest uppercase px-2.5 py-1 rounded-full border" style={{

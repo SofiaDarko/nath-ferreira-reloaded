@@ -15,6 +15,7 @@ export const DEFAULT_THEME: Theme = {
   hoverBorder: '#c8f564',
   linkColor: '#c8f564',
   cardBorder: '#c8f564',
+  projectHoverTitleColor: '#ffffff',
 };
 
 export const DEFAULT_GLOBAL_SETTINGS: GlobalSettings = {
