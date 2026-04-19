@@ -9,8 +9,10 @@ import ContactPage from '../components/portfolio/ContactPage';
 import ProjectModal from '../components/portfolio/ProjectModal';
 import PasswordGate from '../components/portfolio/PasswordGate';
 import AdminPanel from '../components/portfolio/AdminPanel';
+import MobileLayout from '../components/portfolio/mobile/MobileLayout';
 import { TRANSLATIONS } from '../data/translations';
 import { usePortfolioData } from '../hooks/usePortfolioData';
+import { useIsMobile } from '../hooks/use-mobile';
 import type { Project, PageId, Lang } from '../types/portfolio';
 
 // Convert hex (#rgb, #rrggbb, #rrggbbaa) to "H S% L%" string for CSS HSL vars
@@ -132,11 +134,95 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
     setIsLoggedIn(false);
   };
 
+  const isMobile = useIsMobile();
+
   if (loading) {
     return (
       <div className="flex h-screen w-screen items-center justify-center" style={{ backgroundColor: theme.bg }}>
         <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: theme.accent, borderTopColor: 'transparent' }} />
       </div>
+    );
+  }
+
+  if (isMobile) {
+    return (
+      <>
+        {/* Dynamic theme CSS variables — same as desktop, so admin theme changes apply */}
+        <style dangerouslySetInnerHTML={{ __html: `
+          :root {
+            --theme-bg: ${theme.bg};
+            --theme-fg: ${theme.fg};
+            --theme-accent: ${theme.accent};
+            --theme-accent2: ${theme.accent2};
+            --theme-border: ${theme.border};
+            --theme-muted: ${theme.muted};
+            --theme-title-color: ${theme.titleColor};
+            --theme-subtitle-color: ${theme.subtitleColor};
+            --theme-card-bg: ${theme.cardBg};
+            --theme-tag-bg: ${theme.tagBg};
+            --theme-tag-text: ${theme.tagText};
+            --theme-hover-border: ${theme.hoverBorder};
+            --theme-link-color: ${theme.linkColor};
+            --theme-card-border: ${theme.cardBorder};
+
+            --bg: ${hexToHsl(theme.bg)};
+            --background: ${hexToHsl(theme.bg)};
+            --card: ${hexToHsl(theme.bg)};
+            --popover: ${hexToHsl(theme.bg)};
+
+            --fg: ${hexToHsl(theme.fg)};
+            --foreground: ${hexToHsl(theme.fg)};
+            --card-foreground: ${hexToHsl(theme.fg)};
+            --popover-foreground: ${hexToHsl(theme.fg)};
+
+            --accent: ${hexToHsl(theme.accent)};
+            --primary: ${hexToHsl(theme.accent)};
+            --ring: ${hexToHsl(theme.accent)};
+
+            --accent2: ${hexToHsl(theme.accent2)};
+            --destructive: ${hexToHsl(theme.accent2)};
+
+            --border: ${hexToHsl(theme.border)};
+            --input: ${hexToHsl(theme.border)};
+
+            --muted-foreground: ${hexToHsl(theme.muted)};
+          }
+        `}} />
+        <MobileLayout
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          lang={lang}
+          setLang={setLang}
+          t={t}
+          projects={projects}
+          setProjects={setProjects}
+          deleteProject={deleteProject}
+          skills={skills}
+          setSkills={setSkills}
+          deleteSkill={deleteSkill}
+          experiences={experiences}
+          setExperiences={setExperiences}
+          deleteExperience={deleteExperience}
+          education={education}
+          setEducation={setEducation}
+          deleteEducation={deleteEducation}
+          editableTexts={editableTexts}
+          onTextChange={handleTextChange}
+          userPhoto={userPhoto}
+          setUserPhoto={setUserPhoto}
+          theme={theme}
+          setTheme={setTheme}
+          globalSettings={globalSettings}
+          setGlobalSettings={setGlobalSettings}
+          socialLinks={socialLinks}
+          setSocialLinks={setSocialLinks}
+          isLoggedIn={isLoggedIn}
+          showAdmin={showAdmin}
+          onLogout={handleLogout}
+          isEditing={isEditing}
+          setIsEditing={setIsEditing}
+        />
+      </>
     );
   }
 
