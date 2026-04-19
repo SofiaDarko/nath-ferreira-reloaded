@@ -1,53 +1,55 @@
 
 
-## Plano: Aparência funcional + setas centralizadas no ProjectModal
+## Plano: Versão mobile dedicada (sem afetar desktop)
 
-### Problema raiz identificado
-Existem **dois sistemas de cor desconectados**:
-- **Tailwind** (`text-accent`, `border-border`, `bg-bg`, `text-muted-foreground`, `text-fg`) → lê de `hsl(var(--accent))`, `hsl(var(--border))`, etc. definidas em `index.css`
-- **Theme dinâmico** (`var(--theme-accent)`, `var(--theme-bg)`) → injetado em `Index.tsx` via `<style>` a partir do hex de `theme`
+### Estratégia
+Criar **componentes mobile separados** ativados via `useIsMobile()` (breakpoint <768px). Em mobile, `Index.tsx` renderiza um conjunto de componentes em uma pasta `mobile/`. Em desktop, mantém **exatamente** os componentes atuais sem nenhuma alteração.
 
-A maioria dos componentes (Sidebar, AboutPage, ContactPage, ProjectModal, ProjectCard hover) usa só Tailwind → **ignora** as mudanças do painel Aparência. Apenas HomePage usa as `var(--theme-*)`.
+Zero risco para o site desktop: nenhum arquivo de desktop é modificado, exceto `Index.tsx` que apenas decide qual versão renderizar.
 
-### Solução: Sincronizar os dois sistemas
-Em `Index.tsx`, no bloco `<style>` que injeta as variáveis do tema, **converter cada hex de `theme` para HSL** e **sobrescrever também as variáveis Tailwind** (`--bg`, `--fg`, `--accent`, `--border`, `--muted`, `--muted-foreground`, `--accent-foreground`, `--card`, `--popover`, `--background`, `--foreground`, `--primary`, `--ring`, `--input`, `--sidebar-*`).
+### Arquivos novos (pasta `src/components/portfolio/mobile/`)
 
-Assim, **uma única alteração** faz funcionar:
-- Sidebar (texto/borda/hover/accent)
-- Bio, Skills, Educação, Experiências (textos via `text-fg`, `text-muted-foreground`, `text-accent`, `border-border`)
-- ProjectModal (accent, border, bg)
-- Hover dos cards
-- Tags, dots, setas
+1. **`MobileLayout.tsx`** — shell mobile: top bar fixa (logo NF + bandeiras + menu hambúrguer), drawer de navegação (Home / Sobre / Contato + admin se logado), área de conteúdo full-width.
 
-### Arquivos alterados (mínimos)
+2. **`MobileHomePage.tsx`** — header com título grande (`text-5xl`), subtítulo e grid vertical de projetos (1 coluna, cards full-width com aspect-ratio 4/5). Substitui o scroll horizontal Bento (que não funciona bem em mobile) por scroll vertical natural.
 
-**1. `src/pages/Index.tsx`** (única mudança no app)
-- Adicionar utilitário `hexToHsl(hex)` no topo
-- Expandir o bloco `<style>` para também emitir `--bg`, `--fg`, `--accent`, `--border`, `--muted`, `--muted-foreground`, `--card`, `--popover`, `--ring`, `--input`, `--background`, `--foreground`, `--primary`, `--accent-foreground`, `--sidebar-background`, `--sidebar-border`, `--sidebar-accent` em formato HSL (`H S% L%`) derivados de `theme`
-- Mapeamento:
-  - `theme.bg` → `--bg`, `--background`, `--card`, `--popover`, `--sidebar-background`
-  - `theme.fg` → `--fg`, `--foreground`, `--card-foreground`
-  - `theme.accent` → `--accent`, `--primary`, `--ring`, `--sidebar-ring`
-  - `theme.border` → `--border`, `--input`, `--sidebar-border`
-  - `theme.muted` → `--muted-foreground`, `--sidebar-foreground`
+3. **`MobileAboutPage.tsx`** — em vez de 3 painéis com translateX, vira **scroll vertical único** com seções: Foto + Bio → Skills (grid 3 colunas) → Educação (lista) → Experiência (lista). Mantém leitura natural com polegar.
 
-**2. `src/components/portfolio/ProjectModal.tsx`** (centralizar setas + teclado)
-- Remover bloco de setas do painel esquerdo
-- Adicionar duas setas **flutuantes verticalmente centralizadas**, uma colada à esquerda do viewport de imagem e outra à direita (botões circulares com `absolute top-1/2 -translate-y-1/2 left-6 / right-6`)
-- Adicionar `useEffect` com listener de `keydown` para `ArrowLeft` / `ArrowRight`
-- Ambas usam `text-fg`, `border-border`, `hover:border-accent` → herdam o tema
+4. **`MobileContactPage.tsx`** — headline reduzida + lista de links empilhada full-width, áreas de toque grandes (py-6).
+
+5. **`MobileProjectModal.tsx`** — fullscreen, header com X + contador, imagem central com swipe (touch handlers) + setas inferiores grandes, info do projeto colapsável embaixo.
+
+### Arquivo alterado (mínimo)
+
+**`src/pages/Index.tsx`** — adicionar:
+```tsx
+const isMobile = useIsMobile();
+if (isMobile) return <MobileLayout {...allProps} />;
+// ... resto do desktop intocado
+```
+
+A `<style>` de tema continua igual, funciona nos dois.
 
 ### Arquivos NÃO tocados
-- `src/index.css` (mantém defaults para fallback)
-- `tailwind.config.ts`
-- `defaults.ts`, tipos, hook
-- AboutPage, ContactPage, HomePage, Sidebar, AdminPanel — nenhuma alteração necessária, eles passam a responder automaticamente porque suas classes Tailwind agora apontam pras vars sobrescritas
+- `HomePage.tsx`, `AboutPage.tsx`, `ContactPage.tsx`, `ProjectModal.tsx`, `PortfolioSidebar.tsx`, `LanguageSwitcher.tsx`
+- `AdminPanel.tsx` (admin continua desktop-only por enquanto — pode ser usado em mobile via scroll, mas sem layout dedicado)
+- Todos os hooks, tipos, tabelas, defaults, edge functions
+- `index.css`, `tailwind.config.ts`
+
+### Decisões de UX mobile
+- **Scroll vertical** em vez de horizontal/painéis (gesto natural)
+- **Top bar fixa** (56px) com logo + bandeiras + menu
+- **Drawer lateral** para navegação principal
+- **Cards de projeto** em coluna única, aspect 4/5, tap abre modal
+- **Modal fullscreen** com swipe entre imagens
+- **Tipografia reduzida** (título home: 48px em vez de 100px)
+- **Padding reduzido** (16-20px em vez de 60-80px)
+- Painel admin não é repaginado nesta etapa (foco em visitantes)
 
 ### Ponto de restauração
-Esta mensagem é o checkpoint. Se algo der errado: clicar **Revert** na mensagem anterior (a que finalizou o CRUD de Formação) restaura tudo ao estado atual.
+Esta mensagem é o checkpoint. Se algo der errado, basta clicar **Revert** na minha resposta anterior (a que finalizou a sincronização de tema + setas do modal) para voltar ao estado atual sem perder nada.
 
 ### Riscos
-- Conversão hex→HSL precisa ser robusta (suportar `#rgb`, `#rrggbb`, `#rrggbbaa` ignorando alpha)
-- `subtitleColor` (`#ffffff88`) tem alpha — usar como `var(--theme-subtitle-color)` nos lugares que precisam (já está assim em HomePage). Não vai pra Tailwind var.
-- `cardBg` / `tagBg` / `cardBorder` / `linkColor` continuam só em `var(--theme-*)` — os locais que precisam já usam (HomePage cards). Para Modal, vou manter Tailwind defaults sincronizados e os destaques específicos vão via `var(--theme-*)` se necessário.
+- `useIsMobile()` retorna `undefined` no primeiro render → vou tratar como desktop por padrão pra evitar flash
+- Bandeiras do `LanguageSwitcher` ficam dentro do `MobileLayout` em mobile (e o `LanguageSwitcher` original só aparece em desktop)
 
