@@ -65,6 +65,7 @@ export interface Theme {
   hoverBorder: string;
   linkColor: string;
   cardBorder: string;
+  projectHoverTitleColor: string;
 }
 
 export interface GlobalSettings {
