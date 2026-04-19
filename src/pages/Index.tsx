@@ -9,8 +9,10 @@ import ContactPage from '../components/portfolio/ContactPage';
 import ProjectModal from '../components/portfolio/ProjectModal';
 import PasswordGate from '../components/portfolio/PasswordGate';
 import AdminPanel from '../components/portfolio/AdminPanel';
+import MobileLayout from '../components/portfolio/mobile/MobileLayout';
 import { TRANSLATIONS } from '../data/translations';
 import { usePortfolioData } from '../hooks/usePortfolioData';
+import { useIsMobile } from '../hooks/use-mobile';
 import type { Project, PageId, Lang } from '../types/portfolio';
 
 // Convert hex (#rgb, #rrggbb, #rrggbbaa) to "H S% L%" string for CSS HSL vars
