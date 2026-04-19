@@ -1,55 +1,30 @@
 
 
-## Plano: Versão mobile dedicada (sem afetar desktop)
+## Plano: Color picker dedicado para o título do projeto no hover
 
-### Estratégia
-Criar **componentes mobile separados** ativados via `useIsMobile()` (breakpoint <768px). Em mobile, `Index.tsx` renderiza um conjunto de componentes em uma pasta `mobile/`. Em desktop, mantém **exatamente** os componentes atuais sem nenhuma alteração.
+### Mudança mínima
 
-Zero risco para o site desktop: nenhum arquivo de desktop é modificado, exceto `Index.tsx` que apenas decide qual versão renderizar.
+**1. `src/types/portfolio.ts`** — adicionar campo `projectHoverTitleColor: string` em `Theme`.
 
-### Arquivos novos (pasta `src/components/portfolio/mobile/`)
+**2. `src/data/defaults.ts`** — adicionar `projectHoverTitleColor: '#ffffff'` em `DEFAULT_THEME`.
 
-1. **`MobileLayout.tsx`** — shell mobile: top bar fixa (logo NF + bandeiras + menu hambúrguer), drawer de navegação (Home / Sobre / Contato + admin se logado), área de conteúdo full-width.
+**3. `src/pages/Index.tsx`** — emitir nova var `--theme-project-hover-title` no bloco `<style>` a partir de `theme.projectHoverTitleColor`.
 
-2. **`MobileHomePage.tsx`** — header com título grande (`text-5xl`), subtítulo e grid vertical de projetos (1 coluna, cards full-width com aspect-ratio 4/5). Substitui o scroll horizontal Bento (que não funciona bem em mobile) por scroll vertical natural.
+**4. `src/components/portfolio/HomePage.tsx`** — única linha alterada (linha 69): trocar `color: 'var(--theme-fg, #fff)'` por `color: 'var(--theme-project-hover-title, var(--theme-fg, #fff))'` no `<div>` do nome do projeto.
 
-3. **`MobileAboutPage.tsx`** — em vez de 3 painéis com translateX, vira **scroll vertical único** com seções: Foto + Bio → Skills (grid 3 colunas) → Educação (lista) → Experiência (lista). Mantém leitura natural com polegar.
-
-4. **`MobileContactPage.tsx`** — headline reduzida + lista de links empilhada full-width, áreas de toque grandes (py-6).
-
-5. **`MobileProjectModal.tsx`** — fullscreen, header com X + contador, imagem central com swipe (touch handlers) + setas inferiores grandes, info do projeto colapsável embaixo.
-
-### Arquivo alterado (mínimo)
-
-**`src/pages/Index.tsx`** — adicionar:
-```tsx
-const isMobile = useIsMobile();
-if (isMobile) return <MobileLayout {...allProps} />;
-// ... resto do desktop intocado
+**5. `src/components/portfolio/AdminPanel.tsx`** — adicionar uma entrada no array `colorFields` (linha ~406):
+```ts
+{ key: 'projectHoverTitleColor', label: lang === 'pt' ? 'Título do Projeto (hover)' : 'Project Title (hover)' }
 ```
-
-A `<style>` de tema continua igual, funciona nos dois.
+Nenhuma outra lógica muda — o picker é renderizado automaticamente pelo `.map()` existente.
 
 ### Arquivos NÃO tocados
-- `HomePage.tsx`, `AboutPage.tsx`, `ContactPage.tsx`, `ProjectModal.tsx`, `PortfolioSidebar.tsx`, `LanguageSwitcher.tsx`
-- `AdminPanel.tsx` (admin continua desktop-only por enquanto — pode ser usado em mobile via scroll, mas sem layout dedicado)
-- Todos os hooks, tipos, tabelas, defaults, edge functions
-- `index.css`, `tailwind.config.ts`
+- MobileHomePage, AboutPage, ContactPage, ProjectModal, Sidebar, hook, migrations, edge functions
+- O picker `fg` continua controlando todos os outros textos do site normalmente
 
-### Decisões de UX mobile
-- **Scroll vertical** em vez de horizontal/painéis (gesto natural)
-- **Top bar fixa** (56px) com logo + bandeiras + menu
-- **Drawer lateral** para navegação principal
-- **Cards de projeto** em coluna única, aspect 4/5, tap abre modal
-- **Modal fullscreen** com swipe entre imagens
-- **Tipografia reduzida** (título home: 48px em vez de 100px)
-- **Padding reduzido** (16-20px em vez de 60-80px)
-- Painel admin não é repaginado nesta etapa (foco em visitantes)
+### Resultado
+Na aba **Aparência**, aparece um novo color picker "Título do Projeto (hover)" separado do "Texto Principal" (`fg`). Trocar essa cor afeta **somente** o texto que aparece sobre o card do projeto no hover. Default = branco (mesmo comportamento atual), zero regressão visual.
 
 ### Ponto de restauração
-Esta mensagem é o checkpoint. Se algo der errado, basta clicar **Revert** na minha resposta anterior (a que finalizou a sincronização de tema + setas do modal) para voltar ao estado atual sem perder nada.
-
-### Riscos
-- `useIsMobile()` retorna `undefined` no primeiro render → vou tratar como desktop por padrão pra evitar flash
-- Bandeiras do `LanguageSwitcher` ficam dentro do `MobileLayout` em mobile (e o `LanguageSwitcher` original só aparece em desktop)
+Esta mensagem é o checkpoint. Para reverter, clicar **Revert** na resposta anterior (a que finalizou a versão mobile dedicada).
 
