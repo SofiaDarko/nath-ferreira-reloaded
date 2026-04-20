@@ -147,47 +147,36 @@ export function usePortfolioData() {
 
         if (cancelled) return;
 
-        // --- Seed if empty ---
-        let needsSeed = false;
-
+        // Load existing data — NEVER seed/overwrite. Defaults are only used as
+        // in-memory fallback when DB is empty (e.g., brand-new project).
         if (!projRes.error && projRes.data && projRes.data.length > 0) {
           setProjectsLocal(projRes.data.map(dbToProject));
-        } else {
-          needsSeed = true;
         }
 
         if (!skillRes.error && skillRes.data && skillRes.data.length > 0) {
           setSkillsLocal(skillRes.data.map(dbToSkill));
-        } else {
-          needsSeed = true;
         }
 
         if (!expRes.error && expRes.data && expRes.data.length > 0) {
           setExperiencesLocal(expRes.data.map(dbToExperience));
-        } else {
-          needsSeed = true;
         }
 
         if (!eduRes.error && eduRes.data && eduRes.data.length > 0) {
           setEducationLocal((eduRes.data as any[]).map(dbToEducation));
-        } else {
-          needsSeed = true;
         }
 
         if (!settRes.error && settRes.data) {
           const d = settRes.data as any;
-          if (d.theme && Object.keys(d.theme).length > 0) setThemeLocal({ ...DEFAULT_THEME, ...d.theme });
-          if (d.global_settings && Object.keys(d.global_settings).length > 0) setGlobalSettingsLocal({ ...DEFAULT_GLOBAL_SETTINGS, ...d.global_settings });
-          if (d.social_links && Array.isArray(d.social_links) && d.social_links.length > 0) setSocialLinksLocal(d.social_links);
-          if (d.editable_texts && Object.keys(d.editable_texts).length > 0) setEditableTextsLocal(d.editable_texts);
+          // Always merge with defaults so new keys appear, but saved values win.
+          setThemeLocal({ ...DEFAULT_THEME, ...(d.theme || {}) });
+          setGlobalSettingsLocal({ ...DEFAULT_GLOBAL_SETTINGS, ...(d.global_settings || {}) });
+          if (Array.isArray(d.social_links) && d.social_links.length > 0) {
+            setSocialLinksLocal(d.social_links);
+          }
+          if (d.editable_texts && typeof d.editable_texts === 'object') {
+            setEditableTextsLocal(d.editable_texts);
+          }
           if (d.user_photo) setUserPhotoLocal(d.user_photo);
-        } else {
-          needsSeed = true;
-        }
-
-        // Seed defaults into DB for first load (requires auth — skip if anon)
-        if (needsSeed) {
-          seedDefaults();
         }
       } catch (err) {
         console.error('Failed to load portfolio data:', err);
@@ -200,34 +189,6 @@ export function usePortfolioData() {
     return () => { cancelled = true; };
   }, []);
 
-  async function seedDefaults() {
-    // Insert default projects
-    const projInserts = DEFAULT_PROJECTS.map((p, i) => projectToDb(p, i));
-    await supabase.from('projects').upsert(projInserts, { onConflict: 'id' });
-
-    // Insert default skills
-    const skillInserts = DEFAULT_SKILLS.map((s, i) => skillToDb(s, i));
-    await supabase.from('skills').upsert(skillInserts, { onConflict: 'id' });
-
-    // Insert default experiences
-    const expInserts = DEFAULT_EXPERIENCES.map((e, i) => experienceToDb(e, i));
-    await supabase.from('experiences').upsert(expInserts, { onConflict: 'id' });
-
-    // Insert default education
-    const eduInserts = DEFAULT_EDUCATION.map((ed, i) => educationToDb(ed, i));
-    await supabase.from('education' as any).upsert(eduInserts as any, { onConflict: 'id' });
-
-    // Insert default settings
-    await supabase.from('site_settings').upsert({
-      id: 1,
-      theme: DEFAULT_THEME as any,
-      global_settings: DEFAULT_GLOBAL_SETTINGS as any,
-      social_links: DEFAULT_SOCIAL_LINKS as any,
-      editable_texts: {} as any,
-      user_photo: null,
-    }, { onConflict: 'id' });
-  }
-
   /* ── Persist helpers ─────────────────────────────────────── */
 
   const saveSettings = useCallback(async (patch: {
@@ -237,11 +198,26 @@ export function usePortfolioData() {
     editable_texts?: EditableTexts;
     user_photo?: string | null;
   }) => {
-    await supabase.from('site_settings').upsert({
+    // Defensive merge: read current row first, then only overwrite the fields
+    // explicitly provided in `patch`. Prevents partial saves from wiping
+    // unrelated fields (e.g., saving theme should not erase user_photo).
+    const { data: current } = await supabase
+      .from('site_settings')
+      .select('*')
+      .eq('id', 1)
+      .maybeSingle();
+
+    const merged: any = {
       id: 1,
-      ...patch,
+      theme: patch.theme ?? (current as any)?.theme ?? {},
+      global_settings: patch.global_settings ?? (current as any)?.global_settings ?? {},
+      social_links: patch.social_links ?? (current as any)?.social_links ?? [],
+      editable_texts: patch.editable_texts ?? (current as any)?.editable_texts ?? {},
+      user_photo: patch.user_photo !== undefined ? patch.user_photo : (current as any)?.user_photo ?? null,
       updated_at: new Date().toISOString(),
-    } as any, { onConflict: 'id' });
+    };
+
+    await supabase.from('site_settings').upsert(merged, { onConflict: 'id' });
   }, []);
 
   /* ── Public setters (update local + DB) ──────────────────── */
