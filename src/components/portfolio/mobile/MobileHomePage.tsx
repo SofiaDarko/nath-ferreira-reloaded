@@ -85,7 +85,10 @@ const MobileHomePage: React.FC<MobileHomePageProps> = ({ projects, onProjectClic
                   className="absolute inset-x-0 bottom-0 p-4 z-10 flex flex-col gap-2"
                   style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85), transparent)' }}
                 >
-                  <div className="font-display text-base font-bold tracking-tight" style={{ color: theme.fg }}>
+                  <div
+                    className="font-display text-base font-bold tracking-tight"
+                    style={{ color: `var(--theme-project-hover-title, ${theme.fg})` }}
+                  >
                     {name}
                   </div>
                   <div className="flex flex-wrap gap-1.5">
