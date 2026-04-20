@@ -147,47 +147,36 @@ export function usePortfolioData() {
 
         if (cancelled) return;
 
-        // --- Seed if empty ---
-        let needsSeed = false;
-
+        // Load existing data — NEVER seed/overwrite. Defaults are only used as
+        // in-memory fallback when DB is empty (e.g., brand-new project).
         if (!projRes.error && projRes.data && projRes.data.length > 0) {
           setProjectsLocal(projRes.data.map(dbToProject));
-        } else {
-          needsSeed = true;
         }
 
         if (!skillRes.error && skillRes.data && skillRes.data.length > 0) {
           setSkillsLocal(skillRes.data.map(dbToSkill));
-        } else {
-          needsSeed = true;
         }
 
         if (!expRes.error && expRes.data && expRes.data.length > 0) {
           setExperiencesLocal(expRes.data.map(dbToExperience));
-        } else {
-          needsSeed = true;
         }
 
         if (!eduRes.error && eduRes.data && eduRes.data.length > 0) {
           setEducationLocal((eduRes.data as any[]).map(dbToEducation));
-        } else {
-          needsSeed = true;
         }
 
         if (!settRes.error && settRes.data) {
           const d = settRes.data as any;
-          if (d.theme && Object.keys(d.theme).length > 0) setThemeLocal({ ...DEFAULT_THEME, ...d.theme });
-          if (d.global_settings && Object.keys(d.global_settings).length > 0) setGlobalSettingsLocal({ ...DEFAULT_GLOBAL_SETTINGS, ...d.global_settings });
-          if (d.social_links && Array.isArray(d.social_links) && d.social_links.length > 0) setSocialLinksLocal(d.social_links);
-          if (d.editable_texts && Object.keys(d.editable_texts).length > 0) setEditableTextsLocal(d.editable_texts);
+          // Always merge with defaults so new keys appear, but saved values win.
+          setThemeLocal({ ...DEFAULT_THEME, ...(d.theme || {}) });
+          setGlobalSettingsLocal({ ...DEFAULT_GLOBAL_SETTINGS, ...(d.global_settings || {}) });
+          if (Array.isArray(d.social_links) && d.social_links.length > 0) {
+            setSocialLinksLocal(d.social_links);
+          }
+          if (d.editable_texts && typeof d.editable_texts === 'object') {
+            setEditableTextsLocal(d.editable_texts);
+          }
           if (d.user_photo) setUserPhotoLocal(d.user_photo);
-        } else {
-          needsSeed = true;
-        }
-
-        // Seed defaults into DB for first load (requires auth — skip if anon)
-        if (needsSeed) {
-          seedDefaults();
         }
       } catch (err) {
         console.error('Failed to load portfolio data:', err);
