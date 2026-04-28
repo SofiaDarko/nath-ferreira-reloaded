@@ -564,29 +564,68 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                   )}
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className={labelClass}>{t.images}</label>
+                  <label className={labelClass}>{lang === 'pt' ? 'Mídia (imagens e vídeos)' : 'Media (images and videos)'}</label>
                   <div className="border border-dashed border-border rounded-xl p-7 text-center cursor-pointer hover:border-accent transition-all relative">
-                    <input type="file" accept="image/*" multiple onChange={handleImagesUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
-                    <p className="text-[13px] text-muted-foreground leading-relaxed">{lang === 'pt' ? 'Clique ou arraste' : 'Click or drag'}<br /><span className="text-accent font-medium">{lang === 'pt' ? 'múltiplas imagens' : 'multiple images'}</span></p>
-                    <p className="text-[10px] text-muted-foreground/60 mt-2">{lang === 'pt' ? 'Tamanho ideal: 1200 × 800 px' : 'Ideal size: 1200 × 800 px'}</p>
+                    <input type="file" accept="image/*,video/mp4,video/webm,video/quicktime,video/x-m4v" multiple onChange={handleImagesUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
+                    <p className="text-[13px] text-muted-foreground leading-relaxed">{lang === 'pt' ? 'Clique ou arraste' : 'Click or drag'}<br /><span className="text-accent font-medium">{lang === 'pt' ? 'imagens ou vídeos (MP4, WebM, MOV)' : 'images or videos (MP4, WebM, MOV)'}</span></p>
+                    <p className="text-[10px] text-muted-foreground/60 mt-2">{lang === 'pt' ? 'Imagens: 1200×800 px. Vídeos: até 50 MB, qualquer proporção (1:1, 16:9, 9:16, 4:5).' : 'Images: 1200×800 px. Videos: up to 50 MB, any aspect ratio.'}</p>
                   </div>
                   <div className="flex flex-wrap gap-2.5 mt-2.5">
-                    {images.map((img, i) => (
-                      <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border group">
-                        <img src={img} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="%23888"/></svg>'; }} />
-                        <div className="absolute top-1 right-1 w-4 h-4 bg-accent2/90 rounded-full flex items-center justify-center cursor-pointer text-fg text-[10px] font-bold" onClick={() => setImages((prev) => prev.filter((_, idx) => idx !== i))}>✕</div>
-                        <div className="absolute bottom-0 left-0 right-0 flex justify-between bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={() => setImages((prev) => { const a = [...prev]; [a[i - 1], a[i]] = [a[i], a[i - 1]]; return a; })}
-                            className={`p-0.5 text-white ${i === 0 ? 'opacity-30 pointer-events-none' : 'cursor-pointer hover:text-accent'}`}
-                          ><ArrowLeft size={12} /></button>
-                          <button
-                            onClick={() => setImages((prev) => { const a = [...prev]; [a[i], a[i + 1]] = [a[i + 1], a[i]]; return a; })}
-                            className={`p-0.5 text-white ${i === images.length - 1 ? 'opacity-30 pointer-events-none' : 'cursor-pointer hover:text-accent'}`}
-                          ><ArrowRight size={12} /></button>
+                    {images.map((media, i) => {
+                      const vid = isVideo(media);
+                      const meta = videoMeta[media];
+                      const previewSrc = vid ? (meta?.poster || '') : media;
+                      return (
+                        <div key={i} className="relative w-20 h-20 rounded-lg overflow-hidden border border-border group">
+                          {previewSrc ? (
+                            <img src={previewSrc} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="%23888"/></svg>'; }} />
+                          ) : (
+                            <div className="w-full h-full bg-muted flex items-center justify-center"><Play size={18} className="text-muted-foreground" /></div>
+                          )}
+                          {vid && (
+                            <div className="absolute top-1 left-1 px-1 py-[1px] rounded text-[8px] font-bold tracking-wider bg-black/70 text-white">VIDEO</div>
+                          )}
+                          <div className="absolute top-1 right-1 w-4 h-4 bg-accent2/90 rounded-full flex items-center justify-center cursor-pointer text-fg text-[10px] font-bold" onClick={() => removeMedia(i)}>✕</div>
+                          {vid && (
+                            <div className="absolute top-6 right-1 flex flex-col gap-1">
+                              <button
+                                title={meta?.muted === false ? (lang === 'pt' ? 'Som ativo' : 'Sound on') : (lang === 'pt' ? 'Mudo' : 'Muted')}
+                                onClick={() => toggleVideoMute(media)}
+                                className="w-5 h-5 rounded-full bg-black/70 text-white flex items-center justify-center hover:bg-accent hover:text-bg"
+                              >
+                                {meta?.muted === false ? <Volume2 size={11} /> : <VolumeX size={11} />}
+                              </button>
+                              <label
+                                title={lang === 'pt' ? 'Trocar capa do vídeo' : 'Replace video poster'}
+                                className="w-5 h-5 rounded-full bg-black/70 text-white flex items-center justify-center hover:bg-accent hover:text-bg cursor-pointer"
+                              >
+                                <ImageIcon size={11} />
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={(e) => {
+                                    const f = e.target.files?.[0];
+                                    if (f) uploadVideoPoster(media, f);
+                                    e.target.value = '';
+                                  }}
+                                />
+                              </label>
+                            </div>
+                          )}
+                          <div className="absolute bottom-0 left-0 right-0 flex justify-between bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => setImages((prev) => { const a = [...prev]; [a[i - 1], a[i]] = [a[i], a[i - 1]]; return a; })}
+                              className={`p-0.5 text-white ${i === 0 ? 'opacity-30 pointer-events-none' : 'cursor-pointer hover:text-accent'}`}
+                            ><ArrowLeft size={12} /></button>
+                            <button
+                              onClick={() => setImages((prev) => { const a = [...prev]; [a[i], a[i + 1]] = [a[i + 1], a[i]]; return a; })}
+                              className={`p-0.5 text-white ${i === images.length - 1 ? 'opacity-30 pointer-events-none' : 'cursor-pointer hover:text-accent'}`}
+                            ><ArrowRight size={12} /></button>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
                 <div className="flex gap-3">
