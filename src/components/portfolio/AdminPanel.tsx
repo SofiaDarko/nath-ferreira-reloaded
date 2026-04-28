@@ -113,13 +113,72 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     const ts = Date.now();
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      const ext = file.name.split('.').pop() || 'jpg';
+      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+      const isVid = file.type.startsWith('video/') || /^(mp4|webm|mov|m4v)$/i.test(ext);
       const filePath = `projects/${ts}-${i}.${ext}`;
       const { error } = await supabase.storage.from('portfolio-assets').upload(filePath, file);
-      if (error) { console.error('Image upload failed:', error.message); continue; }
+      if (error) { console.error('Upload failed:', error.message); toast.error(`Falha no upload de ${file.name}`); continue; }
       const { data: urlData } = supabase.storage.from('portfolio-assets').getPublicUrl(filePath);
-      setImages((prev) => [...prev, urlData.publicUrl]);
+      const mediaUrl = urlData.publicUrl;
+
+      if (isVid) {
+        // Try to auto-generate a poster frame from the video
+        let posterUrl: string | null = null;
+        try {
+          const posterBlob = await captureVideoPoster(file, 1);
+          const posterPath = `projects/${ts}-${i}-poster.jpg`;
+          const { error: pErr } = await supabase.storage
+            .from('portfolio-assets')
+            .upload(posterPath, posterBlob, { contentType: 'image/jpeg' });
+          if (!pErr) {
+            posterUrl = supabase.storage.from('portfolio-assets').getPublicUrl(posterPath).data.publicUrl;
+          }
+        } catch (err) {
+          console.warn('Poster auto-capture failed:', err);
+        }
+        setVideoMeta((prev) => ({ ...prev, [mediaUrl]: { muted: true, poster: posterUrl } }));
+      }
+
+      setImages((prev) => [...prev, mediaUrl]);
     }
+    // reset input so same file can be re-selected
+    e.target.value = '';
+  };
+
+  const toggleVideoMute = (url: string) => {
+    setVideoMeta((prev) => {
+      const cur = prev[url] ?? { muted: true, poster: null };
+      return { ...prev, [url]: { ...cur, muted: !cur.muted } };
+    });
+  };
+
+  const uploadVideoPoster = async (url: string, file: File) => {
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const filePath = `projects/poster-${Date.now()}.${ext}`;
+    const { error } = await supabase.storage
+      .from('portfolio-assets')
+      .upload(filePath, file, { contentType: file.type || 'image/jpeg' });
+    if (error) { toast.error('Falha ao enviar capa.'); return; }
+    const posterUrl = supabase.storage.from('portfolio-assets').getPublicUrl(filePath).data.publicUrl;
+    setVideoMeta((prev) => {
+      const cur = prev[url] ?? { muted: true, poster: null };
+      return { ...prev, [url]: { ...cur, poster: posterUrl } };
+    });
+    toast.success('Capa do vídeo atualizada.');
+  };
+
+  const removeMedia = (i: number) => {
+    setImages((prev) => {
+      const removed = prev[i];
+      if (removed && isVideo(removed)) {
+        setVideoMeta((vm) => {
+          const next = { ...vm };
+          delete next[removed];
+          return next;
+        });
+      }
+      return prev.filter((_, idx) => idx !== i);
+    });
   };
 
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
