@@ -179,6 +179,7 @@ export type Database = {
           sort_order: number
           tags: string[]
           thumb: string
+          video_meta: Json
         }
         Insert: {
           created_at?: string
@@ -191,6 +192,7 @@ export type Database = {
           sort_order?: number
           tags?: string[]
           thumb?: string
+          video_meta?: Json
         }
         Update: {
           created_at?: string
@@ -203,6 +205,7 @@ export type Database = {
           sort_order?: number
           tags?: string[]
           thumb?: string
+          video_meta?: Json
         }
         Relationships: []
       }
