@@ -65,19 +65,46 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose, lang }) =
         <div className="flex-1 flex items-center justify-center p-10 relative overflow-hidden">
           <div className="w-full h-full relative flex items-center justify-center image-protect-wrapper">
             <AnimatePresence mode="wait">
-              <motion.img
-                key={imgIdx}
-                src={project.images[imgIdx]}
-                alt={`${name} - ${imgIdx + 1}`}
-                initial={{ opacity: 0, scale: 0.97 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.97 }}
-                transition={{ duration: 0.4 }}
-                className="max-w-full max-h-full rounded-xl object-contain shadow-2xl protected-image"
-                referrerPolicy="no-referrer"
-                onContextMenu={(e) => e.preventDefault()}
-                onDragStart={(e) => e.preventDefault()}
-              />
+              {(() => {
+                const currentUrl = project.images[imgIdx];
+                if (isVideo(currentUrl)) {
+                  const meta = project.videoMeta?.[currentUrl];
+                  return (
+                    <motion.video
+                      key={imgIdx}
+                      src={currentUrl}
+                      poster={meta?.poster || undefined}
+                      autoPlay
+                      loop
+                      playsInline
+                      muted={meta?.muted ?? true}
+                      controls
+                      preload="metadata"
+                      initial={{ opacity: 0, scale: 0.97 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.97 }}
+                      transition={{ duration: 0.4 }}
+                      className="max-w-full max-h-full rounded-xl object-contain shadow-2xl protected-image"
+                      onContextMenu={(e) => e.preventDefault()}
+                    />
+                  );
+                }
+                return (
+                  <motion.img
+                    key={imgIdx}
+                    src={currentUrl}
+                    alt={`${name} - ${imgIdx + 1}`}
+                    initial={{ opacity: 0, scale: 0.97 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.97 }}
+                    transition={{ duration: 0.4 }}
+                    className="max-w-full max-h-full rounded-xl object-contain shadow-2xl protected-image"
+                    referrerPolicy="no-referrer"
+                    onContextMenu={(e) => e.preventDefault()}
+                    onDragStart={(e) => e.preventDefault()}
+                  />
+                );
+              })()}
             </AnimatePresence>
           </div>
 
