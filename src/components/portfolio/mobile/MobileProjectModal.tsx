@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, ChevronLeft, ChevronRight, ChevronUp, ChevronDown } from 'lucide-react';
 import type { Project, Theme } from '../../../types/portfolio';
+import { isVideo } from '../../../lib/media';
 
 interface MobileProjectModalProps {
   project: Project;
@@ -87,19 +88,46 @@ const MobileProjectModal: React.FC<MobileProjectModalProps> = ({ project, onClos
         onTouchEnd={onTouchEnd}
       >
         <AnimatePresence mode="wait">
-          <motion.img
-            key={imgIdx}
-            src={project.images[imgIdx]}
-            alt={`${name} - ${imgIdx + 1}`}
-            initial={{ opacity: 0, scale: 0.97 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.97 }}
-            transition={{ duration: 0.3 }}
-            className="max-w-full max-h-full object-contain protected-image px-4"
-            referrerPolicy="no-referrer"
-            onContextMenu={(e) => e.preventDefault()}
-            onDragStart={(e) => e.preventDefault()}
-          />
+          {(() => {
+            const currentUrl = project.images[imgIdx];
+            if (isVideo(currentUrl)) {
+              const meta = project.videoMeta?.[currentUrl];
+              return (
+                <motion.video
+                  key={imgIdx}
+                  src={currentUrl}
+                  poster={meta?.poster || undefined}
+                  autoPlay
+                  loop
+                  playsInline
+                  muted={meta?.muted ?? true}
+                  controls
+                  preload="metadata"
+                  initial={{ opacity: 0, scale: 0.97 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.97 }}
+                  transition={{ duration: 0.3 }}
+                  className="max-w-full max-h-full object-contain protected-image px-4"
+                  onContextMenu={(e) => e.preventDefault()}
+                />
+              );
+            }
+            return (
+              <motion.img
+                key={imgIdx}
+                src={currentUrl}
+                alt={`${name} - ${imgIdx + 1}`}
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.97 }}
+                transition={{ duration: 0.3 }}
+                className="max-w-full max-h-full object-contain protected-image px-4"
+                referrerPolicy="no-referrer"
+                onContextMenu={(e) => e.preventDefault()}
+                onDragStart={(e) => e.preventDefault()}
+              />
+            );
+          })()}
         </AnimatePresence>
 
         {hasMultiple && (
