@@ -252,7 +252,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const clearProjectForm = () => {
     setEditingProjectId(null);
     setName(''); setNameEn(''); setDesc(''); setDescEn('');
-    setSelectedTags([]); setThumb(null); setImages([]);
+    setSelectedTags([]); setThumb(null); setImages([]); setVideoMeta({});
   };
 
   const editProject = (p: Project) => {
@@ -260,6 +260,19 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     setName(p.name); setNameEn(p.name_en || '');
     setDesc(p.description); setDescEn(p.description_en || '');
     setSelectedTags(p.tags); setThumb(p.thumb); setImages(p.images);
+    setVideoMeta(p.videoMeta ?? {});
+  };
+
+  // If user didn't set a thumb and the first media is a video, fall back to its poster
+  const resolveThumb = (explicit: string | null, mediaList: string[], meta: typeof videoMeta, fallback?: string) => {
+    if (explicit) return explicit;
+    const first = mediaList[0];
+    if (first && isVideo(first)) {
+      const poster = meta[first]?.poster;
+      if (poster) return poster;
+    }
+    if (first && !isVideo(first)) return first;
+    return fallback || '';
   };
 
   const saveProject = () => {
@@ -267,12 +280,19 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     if (editingProjectId) {
       setProjects((prev) => prev.map((p) => p.id === editingProjectId ? {
         ...p, name, name_en: nameEn || undefined, description: desc, description_en: descEn || undefined,
-        tags: selectedTags, thumb: thumb || images[0] || p.thumb, images: images.length > 0 ? images : p.images,
+        tags: selectedTags,
+        thumb: resolveThumb(thumb, images.length > 0 ? images : p.images, videoMeta, p.thumb),
+        images: images.length > 0 ? images : p.images,
+        videoMeta,
       } : p));
     } else {
+      const finalImages = images.length > 0 ? images : (thumb ? [thumb] : []);
       const newProject: Project = {
         id: crypto.randomUUID(), name, name_en: nameEn || undefined, description: desc, description_en: descEn || undefined,
-        tags: selectedTags, thumb: thumb || images[0] || '', images: images.length > 0 ? images : (thumb ? [thumb] : []),
+        tags: selectedTags,
+        thumb: resolveThumb(thumb, finalImages, videoMeta),
+        images: finalImages,
+        videoMeta,
       };
       setProjects((prev) => [newProject, ...prev]);
     }
