@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, ChevronLeft, ChevronRight, ChevronUp, ChevronDown } from 'lucide-react';
 import type { Project, Theme } from '../../../types/portfolio';
+import { isVideo } from '../../../lib/media';
 
 interface MobileProjectModalProps {
   project: Project;
