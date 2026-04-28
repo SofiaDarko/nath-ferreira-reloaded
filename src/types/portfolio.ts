@@ -7,6 +7,7 @@ export interface Project {
   tags: string[];
   thumb: string;
   images: string[];
+  videoMeta?: Record<string, { muted: boolean; poster: string | null }>;
 }
 
 export interface Skill {

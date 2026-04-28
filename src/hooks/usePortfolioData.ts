@@ -23,6 +23,7 @@ function dbToProject(r: any): Project {
     tags: r.tags ?? [],
     thumb: r.thumb,
     images: r.images ?? [],
+    videoMeta: (r.video_meta && typeof r.video_meta === 'object') ? r.video_meta : {},
   };
 }
 
@@ -36,6 +37,7 @@ function projectToDb(p: Project, sortOrder: number) {
     tags: p.tags,
     thumb: p.thumb,
     images: p.images,
+    video_meta: p.videoMeta ?? {},
     sort_order: sortOrder,
   };
 }
