@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { motion } from 'motion/react';
-import { X, Plus, Trash2, Pencil, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
+import { X, Plus, Trash2, Pencil, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Volume2, VolumeX, Image as ImageIcon, Play } from 'lucide-react';
 import { HexColorPicker } from 'react-colorful';
 import type { Project, Skill, Experience, Education, EditableTexts, Theme, GlobalSettings, SocialLink } from '../../types/portfolio';
 import { TAG_OPTIONS } from '../../data/translations';
 import { DEFAULT_THEME } from '../../data/defaults';
+import { isVideo, captureVideoPoster } from '../../lib/media';
 import { toast } from 'sonner';
 
 interface AdminPanelProps {
@@ -56,6 +57,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [thumb, setThumb] = useState<string | null>(null);
   const [images, setImages] = useState<string[]>([]);
+  const [videoMeta, setVideoMeta] = useState<Record<string, { muted: boolean; poster: string | null }>>({});
 
   // Skill Form
   const [skillName, setSkillName] = useState('');
