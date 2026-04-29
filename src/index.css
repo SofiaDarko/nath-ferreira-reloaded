@@ -115,7 +115,8 @@ img.protected-image {
   position: relative;
 }
 
-.image-protect-wrapper::after {
+/* overlay only over images, never over videos (so native video controls remain clickable) */
+.image-protect-wrapper:not(:has(video))::after {
   content: '';
   position: absolute;
   inset: 0;

@@ -84,7 +84,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose, lang }) =
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.97 }}
                       transition={{ duration: 0.4 }}
-                      className="max-w-full max-h-full rounded-xl object-contain shadow-2xl protected-image"
+                      className="max-w-full max-h-full rounded-xl object-contain shadow-2xl relative z-10"
                       onContextMenu={(e) => e.preventDefault()}
                     />
                   );

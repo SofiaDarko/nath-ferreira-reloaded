@@ -107,7 +107,7 @@ const MobileProjectModal: React.FC<MobileProjectModalProps> = ({ project, onClos
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.97 }}
                   transition={{ duration: 0.3 }}
-                  className="max-w-full max-h-full object-contain protected-image px-4"
+                  className="max-w-full max-h-full object-contain px-4 relative z-10"
                   onContextMenu={(e) => e.preventDefault()}
                 />
               );
