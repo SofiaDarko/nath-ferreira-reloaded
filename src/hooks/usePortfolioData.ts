@@ -128,7 +128,13 @@ export function usePortfolioData() {
   const [education, setEducationLocal] = useState<Education[]>(DEFAULT_EDUCATION);
   const [editableTexts, setEditableTextsLocal] = useState<EditableTexts>({});
   const [userPhoto, setUserPhotoLocal] = useState<string | null>(null);
-  const [theme, setThemeLocal] = useState<Theme>(DEFAULT_THEME);
+  const [theme, setThemeLocal] = useState<Theme>(() => {
+    try {
+      const cached = typeof window !== 'undefined' ? localStorage.getItem('portfolio_theme_cache') : null;
+      if (cached) return { ...DEFAULT_THEME, ...JSON.parse(cached) };
+    } catch {}
+    return DEFAULT_THEME;
+  });
   const [globalSettings, setGlobalSettingsLocal] = useState<GlobalSettings>(DEFAULT_GLOBAL_SETTINGS);
   const [socialLinks, setSocialLinksLocal] = useState<SocialLink[]>(DEFAULT_SOCIAL_LINKS);
 
@@ -170,7 +176,9 @@ export function usePortfolioData() {
         if (!settRes.error && settRes.data) {
           const d = settRes.data as any;
           // Always merge with defaults so new keys appear, but saved values win.
-          setThemeLocal({ ...DEFAULT_THEME, ...(d.theme || {}) });
+          const mergedTheme = { ...DEFAULT_THEME, ...(d.theme || {}) };
+          setThemeLocal(mergedTheme);
+          try { localStorage.setItem('portfolio_theme_cache', JSON.stringify(mergedTheme)); } catch {}
           setGlobalSettingsLocal({ ...DEFAULT_GLOBAL_SETTINGS, ...(d.global_settings || {}) });
           if (Array.isArray(d.social_links) && d.social_links.length > 0) {
             setSocialLinksLocal(d.social_links);
@@ -285,6 +293,7 @@ export function usePortfolioData() {
     setThemeLocal((prev) => {
       const next = typeof action === 'function' ? action(prev) : action;
       saveSettings({ theme: next });
+      try { localStorage.setItem('portfolio_theme_cache', JSON.stringify(next)); } catch {}
       return next;
     });
   }, [saveSettings]);
