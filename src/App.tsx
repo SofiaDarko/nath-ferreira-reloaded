@@ -15,8 +15,10 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/studio" element={<Index showAdmin />} />
+          <Route path="/" element={<Index initialLang="en" />} />
+          <Route path="/pt" element={<Index initialLang="pt" />} />
+          <Route path="/studio" element={<Index initialLang="en" showAdmin />} />
+          <Route path="/studio/pt" element={<Index initialLang="pt" showAdmin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
