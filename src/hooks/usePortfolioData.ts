@@ -128,7 +128,13 @@ export function usePortfolioData() {
   const [education, setEducationLocal] = useState<Education[]>(DEFAULT_EDUCATION);
   const [editableTexts, setEditableTextsLocal] = useState<EditableTexts>({});
   const [userPhoto, setUserPhotoLocal] = useState<string | null>(null);
-  const [theme, setThemeLocal] = useState<Theme>(DEFAULT_THEME);
+  const [theme, setThemeLocal] = useState<Theme>(() => {
+    try {
+      const cached = typeof window !== 'undefined' ? localStorage.getItem('portfolio_theme_cache') : null;
+      if (cached) return { ...DEFAULT_THEME, ...JSON.parse(cached) };
+    } catch {}
+    return DEFAULT_THEME;
+  });
   const [globalSettings, setGlobalSettingsLocal] = useState<GlobalSettings>(DEFAULT_GLOBAL_SETTINGS);
   const [socialLinks, setSocialLinksLocal] = useState<SocialLink[]>(DEFAULT_SOCIAL_LINKS);
 
