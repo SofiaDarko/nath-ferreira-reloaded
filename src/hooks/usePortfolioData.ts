@@ -293,6 +293,7 @@ export function usePortfolioData() {
     setThemeLocal((prev) => {
       const next = typeof action === 'function' ? action(prev) : action;
       saveSettings({ theme: next });
+      try { localStorage.setItem('portfolio_theme_cache', JSON.stringify(next)); } catch {}
       return next;
     });
   }, [saveSettings]);
