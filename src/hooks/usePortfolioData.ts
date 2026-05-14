@@ -176,7 +176,9 @@ export function usePortfolioData() {
         if (!settRes.error && settRes.data) {
           const d = settRes.data as any;
           // Always merge with defaults so new keys appear, but saved values win.
-          setThemeLocal({ ...DEFAULT_THEME, ...(d.theme || {}) });
+          const mergedTheme = { ...DEFAULT_THEME, ...(d.theme || {}) };
+          setThemeLocal(mergedTheme);
+          try { localStorage.setItem('portfolio_theme_cache', JSON.stringify(mergedTheme)); } catch {}
           setGlobalSettingsLocal({ ...DEFAULT_GLOBAL_SETTINGS, ...(d.global_settings || {}) });
           if (Array.isArray(d.social_links) && d.social_links.length > 0) {
             setSocialLinksLocal(d.social_links);
