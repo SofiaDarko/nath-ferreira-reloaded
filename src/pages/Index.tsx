@@ -41,8 +41,8 @@ function hexToHsl(hex: string): string {
   return `${Math.round(hue)} ${Math.round(sat * 100)}% ${Math.round(lum * 100)}%`;
 }
 
-const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
-  const [lang, setLang] = useState<Lang>('pt');
+const Index: React.FC<{ showAdmin?: boolean; initialLang?: Lang }> = ({ showAdmin, initialLang = 'en' }) => {
+  const [lang, setLang] = useState<Lang>(initialLang);
   const [currentPage, setCurrentPage] = useState<PageId>('home');
   const t = TRANSLATIONS[lang];
 
@@ -106,6 +106,11 @@ const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
     );
     const ogLocale = document.querySelector('meta[property="og:locale"]');
     if (ogLocale) ogLocale.setAttribute('content', isEn ? 'en_GB' : 'pt_BR');
+
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) canonical.setAttribute('href', isEn ? 'https://nathferreiradesigner.com/' : 'https://nathferreiradesigner.com/pt');
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogUrl) ogUrl.setAttribute('content', isEn ? 'https://nathferreiradesigner.com/' : 'https://nathferreiradesigner.com/pt');
   }, [lang]);
 
   const handleTextChange = (id: string, html: string) => {
