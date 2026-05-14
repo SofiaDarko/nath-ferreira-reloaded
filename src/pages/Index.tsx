@@ -106,6 +106,11 @@ const Index: React.FC<{ showAdmin?: boolean; initialLang?: Lang }> = ({ showAdmi
     );
     const ogLocale = document.querySelector('meta[property="og:locale"]');
     if (ogLocale) ogLocale.setAttribute('content', isEn ? 'en_GB' : 'pt_BR');
+
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) canonical.setAttribute('href', isEn ? 'https://nathferreiradesigner.com/' : 'https://nathferreiradesigner.com/pt');
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogUrl) ogUrl.setAttribute('content', isEn ? 'https://nathferreiradesigner.com/' : 'https://nathferreiradesigner.com/pt');
   }, [lang]);
 
   const handleTextChange = (id: string, html: string) => {
