@@ -41,8 +41,8 @@ function hexToHsl(hex: string): string {
   return `${Math.round(hue)} ${Math.round(sat * 100)}% ${Math.round(lum * 100)}%`;
 }
 
-const Index: React.FC<{ showAdmin?: boolean }> = ({ showAdmin }) => {
-  const [lang, setLang] = useState<Lang>('pt');
+const Index: React.FC<{ showAdmin?: boolean; initialLang?: Lang }> = ({ showAdmin, initialLang = 'en' }) => {
+  const [lang, setLang] = useState<Lang>(initialLang);
   const [currentPage, setCurrentPage] = useState<PageId>('home');
   const t = TRANSLATIONS[lang];
 
